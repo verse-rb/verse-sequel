@@ -1,0 +1,141 @@
+GIT
+  remote: https://github.com/verse-rb/verse-core.git
+  revision: c0e6cf99e0f78d0d37c1e225f90f92d3ca64fd99
+  branch: master
+  specs:
+    verse-core (2.0.0)
+      dry-logic (~> 1.3.0)
+      dry-schema (~> 1.9.1)
+      dry-types (~> 1.5.0)
+      dry-validation (~> 1.8.1)
+      i18n (~> 1.10.0)
+      thor (~> 1.2.1)
+
+PATH
+  remote: .
+  specs:
+    verse-sequel (0.1.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.2)
+    bootsnap (1.16.0)
+      msgpack (~> 1.2)
+    coderay (1.1.3)
+    concurrent-ruby (1.2.2)
+    diff-lcs (1.5.0)
+    docile (1.4.0)
+    dry-configurable (0.16.1)
+      dry-core (~> 0.6)
+      zeitwerk (~> 2.6)
+    dry-container (0.11.0)
+      concurrent-ruby (~> 1.0)
+    dry-core (0.9.1)
+      concurrent-ruby (~> 1.0)
+      zeitwerk (~> 2.6)
+    dry-inflector (0.3.0)
+    dry-initializer (3.1.1)
+    dry-logic (1.3.0)
+      concurrent-ruby (~> 1.0)
+      dry-core (~> 0.9, >= 0.9)
+      zeitwerk (~> 2.6)
+    dry-schema (1.9.3)
+      concurrent-ruby (~> 1.0)
+      dry-configurable (~> 0.13, >= 0.13.0)
+      dry-core (~> 0.5, >= 0.5)
+      dry-initializer (~> 3.0)
+      dry-logic (~> 1.0)
+      dry-types (~> 1.5)
+    dry-types (1.5.1)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.3)
+      dry-core (~> 0.5, >= 0.5)
+      dry-inflector (~> 0.1, >= 0.1.2)
+      dry-logic (~> 1.0, >= 1.0.2)
+    dry-validation (1.8.1)
+      concurrent-ruby (~> 1.0)
+      dry-container (~> 0.7, >= 0.7.1)
+      dry-core (~> 0.5, >= 0.5)
+      dry-initializer (~> 3.0)
+      dry-schema (~> 1.8, >= 1.8.0)
+    i18n (1.10.0)
+      concurrent-ruby (~> 1.0)
+    json (2.6.3)
+    language_server-protocol (3.17.0.3)
+    method_source (1.0.0)
+    msgpack (1.7.2)
+    parallel (1.23.0)
+    parser (3.2.2.3)
+      ast (~> 2.4.1)
+      racc
+    pg (1.5.3)
+    pry (0.14.2)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
+    racc (1.7.1)
+    rainbow (3.1.1)
+    rake (13.0.6)
+    regexp_parser (2.8.1)
+    relaxed-rubocop (2.5)
+    rexml (3.2.5)
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.2)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.5)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.1)
+    rubocop (1.53.1)
+      json (~> 2.3)
+      language_server-protocol (>= 3.17.0)
+      parallel (~> 1.10)
+      parser (>= 3.2.2.3)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml (>= 3.2.5, < 4.0)
+      rubocop-ast (>= 1.28.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 3.0)
+    rubocop-ast (1.29.0)
+      parser (>= 3.2.1.0)
+    ruby-progressbar (1.13.0)
+    sequel (5.71.0)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
+    sqlite3 (1.6.3-x86_64-linux)
+    thor (1.2.2)
+    unicode-display_width (2.4.2)
+    yard (0.9.34)
+    zeitwerk (2.6.11)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  bootsnap (~> 1.16)
+  pg
+  pry
+  rake (~> 13.0)
+  relaxed-rubocop
+  rspec (~> 3.0)
+  rubocop (~> 1.21)
+  sequel
+  simplecov
+  sqlite3
+  verse-core!
+  verse-sequel!
+  yard
+
+BUNDLED WITH
+   2.3.16

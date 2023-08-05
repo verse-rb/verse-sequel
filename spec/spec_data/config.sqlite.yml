@@ -1,0 +1,12 @@
+service_name: verse_sequel_specs_sqlite
+description: Testing of the Sequel SQLite implementation.
+
+logging:
+  level: warn
+em:
+  adapter: local
+plugins:
+  - name: sequel
+    config:
+      mode: simple
+      uri: sqlite://tmp/test.sqlite?max_connections=10
