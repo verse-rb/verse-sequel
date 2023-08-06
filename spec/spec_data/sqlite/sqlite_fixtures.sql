@@ -1,13 +1,13 @@
 -- Some sample database to test few features.
 CREATE TABLE questions (
-  id serial PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   content text NOT NULL,
   encoded text,
   topic_id bigint
 );
 
 CREATE TABLE topics (
-  id serial PRIMARY KEY,
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   name varchar(50) NOT NULL
 );
 

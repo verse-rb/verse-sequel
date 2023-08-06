@@ -2,7 +2,7 @@
 
 module Verse
   module Sequel
-    module Filtering
+    module FilteringPg
       module_function
 
       OPERATIONS = {

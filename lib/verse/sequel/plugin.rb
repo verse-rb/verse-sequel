@@ -16,7 +16,9 @@ module Verse
         extensions = config[:extensions]
         db.extension(*extensions.map(&:to_sym)) if extensions
 
-        db.wrap_json_primitives = true
+        if db.respond_to?(:wrap_json_primitives)
+          db.wrap_json_primitives = true
+        end
 
         block.call(db)
       }

@@ -1,25 +1,22 @@
 require "spec_helper"
 
-require_relative "./pg_model"
+require_relative "./sqlite_model"
 
-RSpec.describe "postgresql setup" do
+RSpec.describe "sqlite setup" do
   before :all do
-    uri = YAML.safe_load(File.read("spec/spec_data/config.pg.yml")).dig('plugins', 0, 'config', 'uri')
+    uri = YAML.safe_load(
+      File.read("spec/spec_data/config.sqlite.yml")
+    ).dig('plugins', 0, 'config', 'uri')
 
-    # Small trick: Connect to the pg database itself to drop and create database
-    uri_pg = uri.gsub("verse_sequel_test", "postgres")
-
-    Sequel.connect(uri_pg) do |db|
-      db.execute "DROP DATABASE IF EXISTS verse_sequel_test"
-      db.execute "CREATE DATABASE verse_sequel_test"
-    end
+    file = "tmp/test.sqlite"
+    File.unlink(file) if File.exist?(file)
 
     # Connec on the real db and create the structure
     Sequel.connect(uri) do |db|
       # Setup a sample structure.
-      File.read(File.join("spec", "spec_data", "pg", "pg_fixtures.sql")).split(";").each do |query|
+      File.read(File.join("spec", "spec_data", "sqlite", "sqlite_fixtures.sql")).split(";").each do |query|
         puts "Exec: #{query}"
-        db.execute query
+        db.execute_ddl query
       end
     end
   end
@@ -27,7 +24,7 @@ RSpec.describe "postgresql setup" do
   around :each do |example|
     Verse.start(
       :test,
-      config_path: "./spec/spec_data/config.pg.yml"
+      config_path: "./spec/spec_data/config.sqlite.yml"
     )
 
     Verse::Plugin[:sequel].client(:rw) do |db|
@@ -43,8 +40,8 @@ RSpec.describe "postgresql setup" do
   end
 
   context "testing repository" do
-    let(:question_repo){ Spec::Pg::QuestionRepository.new(Verse::Auth::Context[:system]) }
-    let(:topic_repo){ Spec::Pg::TopicRepository.new(Verse::Auth::Context[:system]) }
+    let(:question_repo){ Spec::Sqlite3::QuestionRepository.new(Verse::Auth::Context[:system]) }
+    let(:topic_repo){ Spec::Sqlite3::TopicRepository.new(Verse::Auth::Context[:system]) }
 
     context "#index" do
       it "can query the questions" do
@@ -95,7 +92,7 @@ RSpec.describe "postgresql setup" do
 
         it "can filter collection (match)" do
           questions = question_repo.index({ content__match: "Hydrogen" })
-          expect(questions.count).to be(1)
+          expect(questions.count).to eq(1)
           expect(questions.first.content).to match(/Hydrogen/)
         end
 
@@ -193,7 +190,7 @@ RSpec.describe "postgresql setup" do
     context "#create" do
       it "creates a new record" do
         result = question_repo.create(content: "A new subject", topic_id: 1001)
-        expect(result).to eq("1") # the newly added ID, in string format.
+        expect(result).to eq("2004") # the newly added ID, in string format.
       end
 
       it "encodes correctly" do

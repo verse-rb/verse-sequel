@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require_relative "./filtering"
+require_relative "./filtering_pg"
+require_relative "./filtering_sqlite"
 
 module Verse
   module Sequel
@@ -87,7 +88,18 @@ module Verse
       end
 
       def filtering
-        Filtering
+        with_db_mode :r do |db|
+          case db.class.name
+          when "Sequel::SQLite::Database"
+            FilteringSqlite
+          when "Sequel::Postgres::Database"
+            FilteringPg
+          else
+            raise "Currently unsupported database type `#{db.class.name}`." \
+                  "Only SQLite and Postgres are supported." \
+                  "Please raise issue if you need support for another database."
+          end
+        end
       end
 
       def index_impl(
