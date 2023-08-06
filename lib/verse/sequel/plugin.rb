@@ -67,11 +67,13 @@ module Verse
 
         load_config
 
-        logger.debug{
-          "[DBAdapter] Sequel with #{@config.inspect}"
-        }
+        # :nocov: #
+        logger.debug{ "[DBAdapter] Sequel with #{@config.inspect}" }
+        # :nocov: #
       rescue LoadError
+        # :nocov: #
         raise LoadError, "`sequel` is not part of the bundle. Add it to your Gemfile."
+        # :nocov: #
       end
 
       def simple_mode?
