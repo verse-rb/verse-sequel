@@ -79,15 +79,65 @@ RSpec.describe "sqlite setup" do
         end
       end
 
+
       context "with filtering" do
         it "can filter collection (simple)" do
           question = question_repo.index({ id: 2001 }).first
-          expect(question.id).to be(2001)
+          expect(question.id).to eq(2001)
         end
 
         it "can filter collection (lt, gt)" do
-          questions = question_repo.index({ id__lt: 2003, id__gt: 2000 })
-          expect(questions.count).to be(2)
+          questions = question_repo.index({ id__lt: 2003, id__gt: 2001 })
+          expect(questions.count).to eq(1)
+        end
+
+        it "can filter collection (lte, gte)" do
+          questions = question_repo.index({ id__lte: 2003, id__gte: 2001 })
+          expect(questions.count).to eq(3)
+        end
+
+        context "eq with array" do
+          it "can filter collection (eq with array)" do
+            questions = question_repo.index({ id__eq: [2003, 2002] })
+            expect(questions.count).to eq(2)
+          end
+
+          it "can filter collection (eq with empty array)" do
+            questions = question_repo.index({ id__eq: [] })
+            expect(questions.count).to eq(0)
+          end
+
+          it "can filter collection (eq with dataset)" do
+            questions = question_repo.index({ id__eq: question_repo.table.where(id: [2003, 2002]).select(:id) })
+            expect(questions.count).to eq(2)
+          end
+        end
+
+        it "can filter out a result using neq" do
+          questions = question_repo.index({ id__neq: 2002 })
+          expect(questions.count).to eq(2)
+        end
+
+        it "can filter out result using prefix" do
+          questions = question_repo.index({ content__prefix: "(C) Why is Hydro" })
+          expect(questions.count).to eq(1)
+          expect(questions.first.content).to match(/^\(C\) Why is Hydro/)
+        end
+
+        it "can filter out result using prefix (safe)" do
+          questions = question_repo.index({ content__prefix: "(C) Why is Hydro%" })
+          expect(questions.count).to eq(0)
+        end
+
+        it "can filter out result using suffix" do
+          questions = question_repo.index({ content__suffix: "Argon?" })
+          expect(questions.count).to eq(1)
+          expect(questions.first.content).to match(/Argon?/)
+        end
+
+        it "can filter out result using suffix (safe)" do
+          questions = question_repo.index({ content__suffix: "%Argon?" })
+          expect(questions.count).to eq(0)
         end
 
         it "can filter collection (match)" do
@@ -96,21 +146,51 @@ RSpec.describe "sqlite setup" do
           expect(questions.first.content).to match(/Hydrogen/)
         end
 
+        context "contains" do
+          it "contains in array" do
+            questions = question_repo.index({ labels__contains: ["science"] })
+            expect(questions.count).to eq(2)
+          end
+
+          it "contains in (empty) array" do
+            questions = question_repo.index({ labels__contains: [] })
+            expect(questions.count).to eq(0)
+          end
+
+          it "contains in jsonb" do
+            questions = question_repo.index({ custom__contains: {a: 1} })
+            expect(questions.count).to eq(2)
+            questions = question_repo.index({ custom__contains: {b: 2} })
+            expect(questions.count).to eq(1)
+          end
+
+          it "contains with string" do
+            questions = question_repo.index({ labels__contains: "science" })
+            expect(questions.count).to eq(2)
+          end
+
+        end
+
         it "can use custom filter" do
-          questions = question_repo.index({ "content.starts_with": "Why" } )
-          expect(questions.count).to be(3)
-          expect(questions.first.content).to match(/^Why/)
+          questions = question_repo.index({ "content.starts_with": "(A) Why" } )
+          expect(questions.count).to eq(1)
+          expect(questions.first.content).to match(/^\(A\) Why/)
         end
 
         it "paginates" do
           questions = question_repo.index(page: 1, items_per_page: 1)
-          expect(questions.count).to be(1)
+          expect(questions.count).to eq(1)
           questions = question_repo.index(page: 2, items_per_page: 1)
-          expect(questions.count).to be(1)
+          expect(questions.count).to eq(1)
           questions = question_repo.index(page: 3, items_per_page: 1)
-          expect(questions.count).to be(1)
+          expect(questions.count).to eq(1)
           questions = question_repo.index(page: 4, items_per_page: 1)
-          expect(questions.count).to be(0)
+          expect(questions.count).to eq(0)
+
+          questions = question_repo.index(page: 1, items_per_page: 2)
+          expect(questions.count).to eq(2)
+          questions = question_repo.index(page: 2, items_per_page: 2)
+          expect(questions.count).to eq(1)
         end
       end
     end

@@ -94,6 +94,11 @@ RSpec.describe "postgresql setup" do
               questions = question_repo.index(sort: "-id")
               expect(questions.first.id).to eq(2003)
             end
+
+            it "can order collection (multiple)" do
+              questions = question_repo.index(sort: "-encoded,id")
+              expect(questions.first.id).to eq(2001)
+            end
           end
 
           context "with filtering" do
@@ -135,13 +140,13 @@ RSpec.describe "postgresql setup" do
             end
 
             it "can filter out result using prefix" do
-              questions = question_repo.index({ content__prefix: "Why is Hydro" })
+              questions = question_repo.index({ content__prefix: "(C) Why is Hydro" })
               expect(questions.count).to eq(1)
-              expect(questions.first.content).to match(/^Why is Hydro/)
+              expect(questions.first.content).to match(/^\(C\) Why is Hydro/)
             end
 
             it "can filter out result using prefix (safe)" do
-              questions = question_repo.index({ content__prefix: "Why is Hydro%" })
+              questions = question_repo.index({ content__prefix: "(C) Why is Hydro%" })
               expect(questions.count).to eq(0)
             end
 
@@ -188,25 +193,25 @@ RSpec.describe "postgresql setup" do
             end
 
             it "can use custom filter" do
-              questions = question_repo.index({ "content.starts_with": "Why" } )
-              expect(questions.count).to be(3)
-              expect(questions.first.content).to match(/^Why/)
+              questions = question_repo.index({ "content.starts_with": "(A) Why" } )
+              expect(questions.count).to eq(1)
+              expect(questions.first.content).to match(/^\(A\) Why/)
             end
 
             it "paginates" do
               questions = question_repo.index(page: 1, items_per_page: 1)
-              expect(questions.count).to be(1)
+              expect(questions.count).to eq(1)
               questions = question_repo.index(page: 2, items_per_page: 1)
-              expect(questions.count).to be(1)
+              expect(questions.count).to eq(1)
               questions = question_repo.index(page: 3, items_per_page: 1)
-              expect(questions.count).to be(1)
+              expect(questions.count).to eq(1)
               questions = question_repo.index(page: 4, items_per_page: 1)
-              expect(questions.count).to be(0)
+              expect(questions.count).to eq(0)
 
               questions = question_repo.index(page: 1, items_per_page: 2)
-              expect(questions.count).to be(2)
+              expect(questions.count).to eq(2)
               questions = question_repo.index(page: 2, items_per_page: 2)
-              expect(questions.count).to be(1)
+              expect(questions.count).to eq(1)
             end
           end
         end
@@ -240,8 +245,8 @@ RSpec.describe "postgresql setup" do
             end
 
             it "can use custom filter" do
-              question = question_repo.find_by({ "content.starts_with": "Why" })
-              expect(question.content).to match(/^Why/)
+              question = question_repo.find_by({ "content.starts_with": "(A) Why" })
+              expect(question.content).to match(/^\(A\) Why/)
             end
 
             it "returns nil if not found" do

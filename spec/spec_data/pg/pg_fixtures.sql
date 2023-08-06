@@ -17,15 +17,15 @@ INSERT INTO topics(id, name) VALUES(1001, 'Science');
 INSERT INTO topics(id, name) VALUES(1002, 'Politics');
 
 INSERT INTO questions(id, content, encoded, topic_id, labels, custom) VALUES(
-  2001, 'Why is Hydrogen less dense than Argon?', '1.2.3.4', 1001,
+  2001, '(C) Why is Hydrogen less dense than Argon?', '1.2.3.4', 1001,
   ARRAY['science', 'physics'], '{"a": 1, "b": 2}'
 );
 
 INSERT INTO questions(id, content, encoded, topic_id, labels, custom) VALUES(
-  2002, 'Why talking about politics during a dinner is a recipe for disaster?',
+  2002, '(B) Why talking about politics during a dinner is a recipe for disaster?',
   '1.2.3.4', 1002, ARRAY['politics', 'society'], '{"a": 1, "b": 3}'
 );
 
-INSERT INTO questions(id, content, topic_id, labels) VALUES(
-  2003, 'Why the sky is blue?', 1001, ARRAY['science', 'sky']
+INSERT INTO questions(id, content, encoded, topic_id, labels) VALUES(
+  2003, '(A) Why the sky is blue?', '1.2.3.2', 1001, ARRAY['science', 'sky']
 );
