@@ -142,7 +142,7 @@ module Verse
         end
       end
 
-      def find_by(filters, scope: scoped(:read), included: [], record: self.class.model_class)
+      def find_by(filters = {}, scope: scoped(:read), included: [], record: self.class.model_class)
         filters = encode_filters(filters)
 
         with_db_mode :r do

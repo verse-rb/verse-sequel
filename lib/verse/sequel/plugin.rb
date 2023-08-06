@@ -80,26 +80,41 @@ module Verse
         @new_connection_rw == @new_connection_r
       end
 
+      # Create or reuse the existing thread connection for the database.
       def client(mode = :rw, &block)
-        # Not a big fan of the switch between read and read-write connection...
-        key = nil
-        connection_block = nil
-
         if simple_mode?
-          key = :"verse-sequel"
-          connection_block = @new_connection_r
-        else
-          key = :"verse-sequel-#{mode}"
-          connection_block = mode == :rw ? @new_connection_rw : @new_connection_r
-        end
+          db = Thread.current[:"verse-sequel-db"]
 
-        db = Thread.current[key]
-        if db
-          block.call(db)
-        else
-          init_client(
-            connection_block, key, &block
+          return block.call(db) if db
+
+          return init_client(
+            @new_connection_rw, :"verse-sequel-db", &block
           )
+        else
+          case mode
+          when :rw
+            db = Thread.current[:"verse-sequel-db-rw"]
+            return block.call(db) if db
+
+            return init_client(
+              @new_connection_rw, :"verse-sequel-db-rw", &block
+            )
+          when :r
+            # In the case we are already in read-write mode,
+            # we get RW the connection to do the read operation.
+            # This is to prevent weird issue occuring in transaction, when
+            # two different connection are used.
+            db = Thread.current[:"verse-sequel-db-rw"]
+            return block.call(db) if db
+
+            # Otherwise we move to the read-only connection:
+            db = Thread.current[:"verse-sequel-db-r"]
+            return block.call(db) if db
+
+            return init_client(
+              @new_connection_r, :"verse-sequel-db-r"
+            )
+          end
         end
       end
 
