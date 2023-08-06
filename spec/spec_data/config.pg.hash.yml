@@ -1,0 +1,16 @@
+service_name: verse_sequel_specs_sqlite
+description: Testing of the Sequel SQLite implementation.
+
+logging:
+  level: warn
+em:
+  adapter: local
+plugins:
+  - name: sequel
+    config:
+      mode: simple
+      adapter: postgres
+      user: postgres
+      host: localhost
+      port: 5432
+      database: verse_sequel_test

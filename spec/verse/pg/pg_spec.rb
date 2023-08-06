@@ -26,7 +26,7 @@ RSpec.describe "postgresql setup" do
     end
   end
 
-  %i<simple cluster>.each do |mode|
+  %i<simple cluster hash>.each do |mode|
     context "mode #{mode}" do
       around :each do |example|
         Verse.start(
