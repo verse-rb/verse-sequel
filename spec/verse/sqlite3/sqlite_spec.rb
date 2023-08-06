@@ -146,31 +146,6 @@ RSpec.describe "sqlite setup" do
           expect(questions.first.content).to match(/Hydrogen/)
         end
 
-        context "contains" do
-          it "contains in array" do
-            questions = question_repo.index({ labels__contains: ["science"] })
-            expect(questions.count).to eq(2)
-          end
-
-          it "contains in (empty) array" do
-            questions = question_repo.index({ labels__contains: [] })
-            expect(questions.count).to eq(0)
-          end
-
-          it "contains in jsonb" do
-            questions = question_repo.index({ custom__contains: {a: 1} })
-            expect(questions.count).to eq(2)
-            questions = question_repo.index({ custom__contains: {b: 2} })
-            expect(questions.count).to eq(1)
-          end
-
-          it "contains with string" do
-            questions = question_repo.index({ labels__contains: "science" })
-            expect(questions.count).to eq(2)
-          end
-
-        end
-
         it "can use custom filter" do
           questions = question_repo.index({ "content.starts_with": "(A) Why" } )
           expect(questions.count).to eq(1)
@@ -223,8 +198,8 @@ RSpec.describe "sqlite setup" do
         end
 
         it "can use custom filter" do
-          question = question_repo.find_by({ "content.starts_with": "Why" })
-          expect(question.content).to match(/^Why/)
+          question = question_repo.find_by({ "content.starts_with": "(A) Why" })
+          expect(question.content).to match(/^\(A\) Why/)
         end
 
         it "returns nil if not found" do

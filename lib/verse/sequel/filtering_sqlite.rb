@@ -3,6 +3,8 @@
 module Verse
   module Sequel
     module FilteringSqlite
+      module_function
+
       OPERATIONS = {
         lt: ->(col, column, value) { col.where(::Sequel.lit("#{column} < ?", value)) },
         lte: ->(col, column, value) { col.where(::Sequel.lit("#{column} <= ?", value)) },
@@ -23,30 +25,21 @@ module Verse
           end
         },
         neq: ->(col, column, value) { col.where(::Sequel.lit("#{column} != ?", value)) },
-        prefix: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "#{value.to_s.downcase}%")) },
+        prefix: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "#{escape_like(value.to_s.downcase)}%")) },
+        suffix: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "%#{escape_like(value.to_s.downcase)}")) },
         in: ->(col, column, value) { col.where(::Sequel.lit("#{column} IN ?", value)) },
-        match: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "%#{value.to_s.downcase}%")) },
-        contains: ->(col, column, value) {
-          case value
-          when Array
-            if value.empty?
-              col.where(::Sequel.lit("false"))
-            else
-              col.where(::Sequel.lit("#{column} && '{#{value.map(&:to_json).join(",")}}'"))
-            end
-          when Hash
-            col.where(::Sequel.lit("#{column} @> ?", value.to_json))
-          else
-            col.where(::Sequel.lit("#{column} @> ?", "{#{value}}"))
-          end
-        },
-      }.freeze
+        match: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "%#{escape_like(value.to_s.downcase)}%")) }
+      }
 
-      def self.expect_array?(operator)
+      def escape_like(value)
+        value.gsub(/[\\%_]/, "\\\\\\0")
+      end
+
+      def expect_array?(operator)
         %i<contains in eq>.include?(operator.to_sym)
       end
 
-      def self.filter_by(collection, filtering_parameters, custom_filters)
+      def filter_by(collection, filtering_parameters, custom_filters)
         return collection if filtering_parameters.nil? || filtering_parameters.empty?
 
         filtering_parameters.each do |key, value|

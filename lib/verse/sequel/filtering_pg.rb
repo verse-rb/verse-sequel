@@ -47,7 +47,7 @@ module Verse
             # :nocov:
           end
         },
-      }.freeze
+      }
 
       def escape_like(value)
         value.gsub(/[\\%_]/, "\\\\\\0")
