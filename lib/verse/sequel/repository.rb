@@ -169,20 +169,19 @@ module Verse
         if !sort.is_a?(String)
           # :nocov:
           raise ArgumentError, "incorrect ordering parameter type (must be string)"
-          #:nocov:
+          # :nocov:
         end
 
         sort.split(",").each do |x|
-          if x[0] == "-"
-            query = query.order(::Sequel.desc(x[1..-1].to_sym))
-          else
-            query = query.order(::Sequel.asc(x.to_sym))
-          end
+          query = if x[0] == "-"
+                    query.order(::Sequel.desc(x[1..].to_sym))
+                  else
+                    query.order(::Sequel.asc(x.to_sym))
+                  end
         end
 
         query
       end
-
     end
   end
 end

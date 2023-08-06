@@ -179,9 +179,9 @@ RSpec.describe "postgresql setup" do
               end
 
               it "contains in jsonb" do
-                questions = question_repo.index({ custom__contains: {a: 1} })
+                questions = question_repo.index({ custom__contains: { a: 1 } })
                 expect(questions.count).to eq(2)
-                questions = question_repo.index({ custom__contains: {b: 2} })
+                questions = question_repo.index({ custom__contains: { b: 2 } })
                 expect(questions.count).to eq(1)
               end
 
@@ -189,7 +189,6 @@ RSpec.describe "postgresql setup" do
                 questions = question_repo.index({ labels__contains: "science" })
                 expect(questions.count).to eq(2)
               end
-
             end
 
             it "can use custom filter" do
@@ -215,7 +214,6 @@ RSpec.describe "postgresql setup" do
             end
           end
         end
-
 
         context "#find_by" do
           it "can query the questions" do
@@ -290,7 +288,7 @@ RSpec.describe "postgresql setup" do
         context "#create" do
           it "creates a new record" do
             result = question_repo.create(content: "A new subject", topic_id: 1001)
-            record = question_repo.find_by({content: "A new subject"})
+            record = question_repo.find_by({ content: "A new subject" })
             expect(result).to eq(record.id.to_s) # the newly added ID, in string format.
           end
 

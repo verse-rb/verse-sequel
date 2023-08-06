@@ -29,7 +29,7 @@ module Verse
         suffix: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "%#{escape_like(value.to_s.downcase)}")) },
         in: ->(col, column, value) { col.where(::Sequel.lit("#{column} IN ?", value)) },
         match: ->(col, column, value) { col.where(::Sequel.lit("LOWER(#{column}) LIKE ?", "%#{escape_like(value.to_s.downcase)}%")) }
-      }
+      }.freeze
 
       def escape_like(value)
         value.gsub(/[\\%_]/, "\\\\\\0")

@@ -79,7 +79,6 @@ RSpec.describe "sqlite setup" do
         end
       end
 
-
       context "with filtering" do
         it "can filter collection (simple)" do
           question = question_repo.index({ id: 2001 }).first

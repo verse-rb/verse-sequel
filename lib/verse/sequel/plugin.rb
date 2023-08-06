@@ -25,7 +25,9 @@ module Verse
       attr_reader :config
 
       def description
+        # :nocov:
         "Sequel adapter for Verse framework."
+        # :nocov:
       end
 
       def create_connection_provider(config)
@@ -69,7 +71,9 @@ module Verse
           @new_connection_r = create_connection_provider(@config[:replica])
           @new_connection_rw = create_connection_provider(@config[:master])
         else
+          # :nocov:
           raise ArgumentError, "unknown mode `#{@config[:mode]}`"
+          # :nocov:
         end
       end
 
@@ -98,7 +102,7 @@ module Verse
 
           return block.call(db) if db
 
-          return init_client(
+          init_client(
             @new_connection_rw, :"verse-sequel-db", &block
           )
         else
@@ -107,7 +111,7 @@ module Verse
             db = Thread.current[:"verse-sequel-db-rw"]
             return block.call(db) if db
 
-            return init_client(
+            init_client(
               @new_connection_rw, :"verse-sequel-db-rw", &block
             )
           when :r
@@ -122,7 +126,7 @@ module Verse
             db = Thread.current[:"verse-sequel-db-r"]
             return block.call(db) if db
 
-            return init_client(
+            init_client(
               @new_connection_r, :"verse-sequel-db-r"
             )
           end

@@ -19,34 +19,32 @@ module Verse
       rule(:mode, :master, :replica, :db) do
         if values[:mode].to_s == "cluster"
           if values[:master].nil? || values[:replica].nil?
-            #:nocov:
+            # :nocov:
             key.failure("must contains the master and replica keys")
-            #:nocov:
+            # :nocov:
           end
 
           if values[:db]
-            #:nocov:
+            # :nocov:
             key.failures("must not define db keys")
-            #:nocov:
+            # :nocov:
           end
         end
 
         if values[:mode].to_s == "simple"
           if values[:db].nil?
-            #:nocov:
+            # :nocov:
             key.failure("must define db keys")
-            #:nocov:
+            # :nocov:
           end
 
           if values[:master] || values[:replica]
-            #:nocov:
+            # :nocov:
             key.failures("must not define master or replica keys")
-            #:nocov:
+            # :nocov:
           end
         end
-
       end
-
     end
   end
 end
