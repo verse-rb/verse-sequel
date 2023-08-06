@@ -9,8 +9,9 @@ plugins:
   - name: sequel
     config:
       mode: simple
-      adapter: postgres
-      user: postgres
-      host: localhost
-      port: 5432
-      database: verse_sequel_test
+      db:
+        adapter: postgres
+        user: postgres
+        host: localhost
+        port: 5432
+        database: verse_sequel_test

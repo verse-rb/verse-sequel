@@ -49,10 +49,21 @@ module Verse
         end
       end
 
+      def validate_config!
+        result = Verse::Sequel::Config.new.call(
+          @config
+        )
+        return result unless result.errors.any?
+
+        raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
+      end
+
       def load_config
+        @config = validate_config!
+
         case @config[:mode].to_sym
         when :simple
-          @new_connection_r = create_connection_provider(@config)
+          @new_connection_r = create_connection_provider(@config[:db])
           @new_connection_rw = @new_connection_r
         when :cluster
           @new_connection_r = create_connection_provider(@config[:replica])

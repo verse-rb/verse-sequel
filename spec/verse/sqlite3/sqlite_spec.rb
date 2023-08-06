@@ -8,7 +8,7 @@ RSpec.describe "sqlite setup" do
   before :all do
     uri = YAML.safe_load(
       File.read("spec/spec_data/config.sqlite.yml")
-    ).dig("plugins", 0, "config", "uri")
+    ).dig("plugins", 0, "config", "db", "uri")
 
     file = "tmp/test.sqlite"
     File.unlink(file) if File.exist?(file)

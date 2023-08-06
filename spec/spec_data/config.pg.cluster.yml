@@ -9,10 +9,13 @@ plugins:
   - name: sequel
     config:
       mode: cluster
-      extensions:
-        - pg_json
-        - pg_array
       master:
+        extensions:
+          - pg_json
+          - pg_array
         uri: postgres://postgres@localhost:5432/verse_sequel_test
       replica:
+        extensions:
+          - pg_json
+          - pg_array
         uri: postgres://postgres@localhost:5432/verse_sequel_test

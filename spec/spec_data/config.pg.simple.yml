@@ -9,7 +9,8 @@ plugins:
   - name: sequel
     config:
       mode: simple
-      extensions:
-        - pg_json
-        - pg_array
-      uri: postgres://postgres@localhost:5432/verse_sequel_test
+      db:
+        extensions:
+          - pg_json
+          - pg_array
+        uri: postgres://postgres@localhost:5432/verse_sequel_test

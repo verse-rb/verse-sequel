@@ -95,9 +95,11 @@ module Verse
           when "Sequel::Postgres::Database"
             FilteringPg
           else
+            # :nocov:
             raise "Currently unsupported database type `#{db.class.name}`." \
                   "Only SQLite and Postgres are supported." \
                   "Please raise issue if you need support for another database."
+            # :nocov:
           end
         end
       end
@@ -119,20 +121,7 @@ module Verse
 
           query = query.offset( (page - 1) * items_per_page).limit(items_per_page) if page
 
-          case sort
-          when Array
-            sort.each do |it|
-              case it
-              when Array
-                key, dir = it
-                query = query.order(dir == :desc ? Sequel.desc(key) : Sequel.asc(key))
-              when Symbol, String
-                query = query.order(Sequel.asc(it))
-              end
-            end
-          when Symbol, String
-            query = query.order(Sequel.asc(sort))
-          end
+          query = prepare_ordering(query, sort) if sort
 
           count = query_count ? query.count : nil
 
@@ -175,6 +164,25 @@ module Verse
           scope.custom? { |id| table.where(pkey => id) }
         end
       end
+
+      def prepare_ordering(query, sort)
+        if !sort.is_a?(String)
+          # :nocov:
+          raise ArgumentError, "incorrect ordering parameter type (must be string)"
+          #:nocov:
+        end
+
+        sort.split(",").each do |x|
+          if x[0] == "-"
+            query = query.order(::Sequel.desc(x[1..-1].to_sym))
+          else
+            query = query.order(::Sequel.asc(x.to_sym))
+          end
+        end
+
+        query
+      end
+
     end
   end
 end

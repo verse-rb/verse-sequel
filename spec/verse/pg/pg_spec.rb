@@ -6,7 +6,7 @@ require_relative "./pg_model"
 
 RSpec.describe "postgresql setup" do
   before :all do
-    uri = YAML.safe_load(File.read("spec/spec_data/config.pg.simple.yml")).dig("plugins", 0, "config", "uri")
+    uri = YAML.safe_load(File.read("spec/spec_data/config.pg.simple.yml")).dig("plugins", 0, "config", "db", "uri")
 
     # Small trick: Connect to the pg database itself to drop and create database
     uri_pg = uri.gsub("verse_sequel_test", "postgres")
@@ -81,6 +81,18 @@ RSpec.describe "postgresql setup" do
               else
                 expect(q.topic_with_condition).to be_nil
               end
+            end
+          end
+
+          context "with ordering" do
+            it "can order collection (simple asc)" do
+              questions = question_repo.index(sort: "id")
+              expect(questions.first.id).to eq(2001)
+            end
+
+            it "can order collection (simple desc)" do
+              questions = question_repo.index(sort: "-id")
+              expect(questions.first.id).to eq(2003)
             end
           end
 
@@ -198,6 +210,7 @@ RSpec.describe "postgresql setup" do
             end
           end
         end
+
 
         context "#find_by" do
           it "can query the questions" do
