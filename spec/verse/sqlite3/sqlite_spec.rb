@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 require_relative "./sqlite_model"
@@ -6,7 +8,7 @@ RSpec.describe "sqlite setup" do
   before :all do
     uri = YAML.safe_load(
       File.read("spec/spec_data/config.sqlite.yml")
-    ).dig('plugins', 0, 'config', 'uri')
+    ).dig("plugins", 0, "config", "uri")
 
     file = "tmp/test.sqlite"
     File.unlink(file) if File.exist?(file)
@@ -34,7 +36,6 @@ RSpec.describe "sqlite setup" do
         raise Sequel::Rollback
       end
     end
-
   ensure
     Verse.stop
   end
@@ -62,7 +63,7 @@ RSpec.describe "sqlite setup" do
       end
 
       it "decodes correctly" do
-        questions = question_repo.index()
+        questions = question_repo.index
         expect(questions.first.encoded).to eq("1234")
       end
 
@@ -77,7 +78,6 @@ RSpec.describe "sqlite setup" do
           end
         end
       end
-
 
       context "with filtering" do
         it "can filter collection (simple)" do
@@ -97,7 +97,7 @@ RSpec.describe "sqlite setup" do
         end
 
         it "can use custom filter" do
-          questions = question_repo.index({"content.starts_with": "Why"} )
+          questions = question_repo.index({ "content.starts_with": "Why" } )
           expect(questions.count).to be(3)
           expect(questions.first.content).to match(/^Why/)
         end
@@ -113,49 +113,48 @@ RSpec.describe "sqlite setup" do
           expect(questions.count).to be(0)
         end
       end
-
     end
 
     context "#find_by" do
       it "can query the questions" do
-        question = question_repo.find_by({id: 2002})
+        question = question_repo.find_by({ id: 2002 })
         expect(question.id).to be(2002)
       end
 
       it "can query the question with included" do
-        question = question_repo.find_by({id: 2002}, included: ["topic"])
+        question = question_repo.find_by({ id: 2002 }, included: ["topic"])
         expect(question.topic).not_to be(nil)
       end
 
       it "decodes correctly" do
-        question = question_repo.find_by({id: 2002})
+        question = question_repo.find_by({ id: 2002 })
         expect(question.encoded).to eq("1234")
       end
 
       context "with filtering" do
         it "can filter collection (lt, gt)" do
-          question = question_repo.find_by({id__lt: 2002, id__gt: 2000}) # should be id = 1
+          question = question_repo.find_by({ id__lt: 2002, id__gt: 2000 }) # should be id = 1
           expect(question.id).to be(2001)
         end
 
         it "can filter collection (match)" do
-          question = question_repo.find_by({content__match: "Hydrogen"})
+          question = question_repo.find_by({ content__match: "Hydrogen" })
           expect(question.content).to match(/Hydrogen/)
         end
 
         it "can use custom filter" do
-          question = question_repo.find_by({"content.starts_with": "Why"})
+          question = question_repo.find_by({ "content.starts_with": "Why" })
           expect(question.content).to match(/^Why/)
         end
 
         it "returns nil if not found" do
-          question = question_repo.find_by({content__match: "This is not in the db"})
+          question = question_repo.find_by({ content__match: "This is not in the db" })
           expect(question).to be(nil)
         end
 
         it "raises error using the find_by! alternative and not found" do
           expect do
-            question = question_repo.find_by!({content__match: "This is not in the db"})
+            question_repo.find_by!({ content__match: "This is not in the db" })
           end.to raise_error(Verse::Error::RecordNotFound)
         end
       end
@@ -163,28 +162,27 @@ RSpec.describe "sqlite setup" do
 
     context "#update" do
       it "updates an existing model" do
-        result = question_repo.update(2001, {content: "A new question?"})
+        result = question_repo.update(2001, { content: "A new question?" })
         expect(result).to be(true)
       end
 
       it "encodes correctly" do
-        result = question_repo.update(2001, {encoded: "2345"})
+        question_repo.update(2001, { encoded: "2345" })
         encoded = question_repo.table.where(id: 2001).first[:encoded]
         expect(encoded).to eq("2.3.4.5")
       end
 
       it "returns false if the model doesn't exists" do
         # id not found
-        result = question_repo.update(42, {content: "A new question?"})
+        result = question_repo.update(42, { content: "A new question?" })
         expect(result).to be(false)
       end
 
       it "raises error with update! when column is not found" do
         expect do
-          question_repo.update!(42, {content: "A new question?"})
+          question_repo.update!(42, { content: "A new question?" })
         end.to raise_error(Verse::Error::RecordNotFound)
       end
-
     end
 
     context "#create" do
@@ -202,22 +200,21 @@ RSpec.describe "sqlite setup" do
       it "fails to create a new record if postgres throw an error" do
         # missing content field, but set to NOT NULL
         expect do
-          result = question_repo.create(topic_id: 1001)
+          question_repo.create(topic_id: 1001)
         end.to raise_error(Verse::Error::CannotCreateRecord)
       end
     end
 
-    context '#delete' do
-      it 'returns true if something is deleted' do
+    context "#delete" do
+      it "returns true if something is deleted" do
         result = question_repo.delete(2001)
         expect(result).to eq(true)
       end
 
-      it 'returns false if nothing is deleted' do
+      it "returns false if nothing is deleted" do
         result = question_repo.delete(42)
         expect(result).to eq(false)
       end
     end
   end
-
 end

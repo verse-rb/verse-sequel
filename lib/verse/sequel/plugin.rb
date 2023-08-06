@@ -7,7 +7,6 @@ module Verse
   module Sequel
     # https://docs.mongodb.com/ruby-driver/current/
     class Plugin < Verse::Plugin::Base
-
       class << self
         attr_accessor :on_create_connection
       end
@@ -64,7 +63,7 @@ module Verse
       end
 
       def on_init
-        require 'sequel'
+        require "sequel"
 
         load_config
 
@@ -72,14 +71,14 @@ module Verse
           "[DBAdapter] Sequel with #{@config.inspect}"
         }
       rescue LoadError
-        raise LoadError, '`sequel` is not part of the bundle. Add it to your Gemfile.'
+        raise LoadError, "`sequel` is not part of the bundle. Add it to your Gemfile."
       end
 
       def simple_mode?
         @new_connection_rw == @new_connection_r
       end
 
-      def client(mode=:rw, &block)
+      def client(mode = :rw, &block)
         # Not a big fan of the switch between read and read-write connection...
         key = nil
         connection_block = nil
@@ -93,9 +92,13 @@ module Verse
         end
 
         db = Thread.current[key]
-        db ? block.call(db) : init_client(
-          connection_block, key, &block
-        )
+        if db
+          block.call(db)
+        else
+          init_client(
+            connection_block, key, &block
+          )
+        end
       end
 
       private

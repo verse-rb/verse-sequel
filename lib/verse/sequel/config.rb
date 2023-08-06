@@ -16,14 +16,13 @@ module Verse
 
       rule(:cluster, :db) do
         if value[:cluster].nil? && value[:db].nil?
-          key.failure('cluster or db must be defined')
+          key.failure("cluster or db must be defined")
         end
 
         unless value[:cluster].nil? ^ value[:db].nil?
-          key.failure('cluster or db are mutually exclusive')
+          key.failure("cluster or db are mutually exclusive")
         end
       end
-
     end
   end
 end

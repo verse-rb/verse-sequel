@@ -6,11 +6,12 @@ require_relative "./filtering_sqlite"
 module Verse
   module Sequel
     class Repository < Verse::Model::Repository::Base
-
       class << self
         attr_accessor :pkey, :plugin
 
         def inherited(subklass)
+          super
+
           subklass.pkey   = pkey
           subklass.plugin = plugin
         end
@@ -34,7 +35,7 @@ module Verse
 
       def with_db_mode(mode, &block)
         # We don't care about mode with MongoDB.
-        Verse::Plugin[self.class.plugin].client(mode) do |db|
+        Verse::Plugin[self.class.plugin].client(mode) do |_db|
           old_mode, @current_mode = @current_mode, mode
           client(&block)
         ensure
@@ -70,7 +71,6 @@ module Verse
 
           id.to_s
         end
-
       end
 
       event("updated")
@@ -117,7 +117,7 @@ module Verse
         with_db_mode :r do
           query = filtering.filter_by(scope, filters, self.class.custom_filters)
 
-          query = query.offset( (page-1) * items_per_page).limit(items_per_page) if page
+          query = query.offset( (page - 1) * items_per_page).limit(items_per_page) if page
 
           case sort
           when Array
@@ -134,11 +134,11 @@ module Verse
             query = query.order(Sequel.asc(sort))
           end
 
-          count = query.count
+          count = query_count ? query.count : nil
 
-          set = prepare_included(included, query, record: record)
+          prepare_included(included, query, record: record)
 
-          [query.to_a, {count: count}]
+          [query.to_a, { count: count }.compact]
         end
       end
 

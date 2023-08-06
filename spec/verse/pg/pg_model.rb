@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Spec
   module Pg
     class TopicRepository < Verse::Sequel::Repository
@@ -40,7 +42,7 @@ module Spec
       end
     end
 
-    class QuestionRecord <  Verse::Model::Record::Base
+    class QuestionRecord < Verse::Model::Record::Base
       field :id, primary: true
 
       field :content
@@ -49,7 +51,7 @@ module Spec
 
       belongs_to :topic, primary_key: :id, repository: "Spec::Pg::TopicRepository"
 
-      belongs_to :topic_with_condition, primary_key: :id, foreign_key: :topic_id, repository: "Spec::Pg::TopicRepository", if: -> (record) {
+      belongs_to :topic_with_condition, primary_key: :id, foreign_key: :topic_id, repository: "Spec::Pg::TopicRepository", if: ->(record) {
         record[:content] =~ /Hydrogen/
       }
     end
