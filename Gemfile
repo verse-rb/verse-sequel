@@ -18,8 +18,6 @@ gem "bootsnap", "~> 1.16"
 
 gem "verse-core", github: "verse-rb/verse-core", branch: "master"
 
-gem "sequel"
-
 gem "pg"
 gem "sqlite3"
 

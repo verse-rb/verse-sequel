@@ -15,6 +15,7 @@ PATH
   remote: .
   specs:
     verse-sequel (0.1.0)
+      sequel (~> 5)
 
 GEM
   remote: https://rubygems.org/
@@ -130,7 +131,6 @@ DEPENDENCIES
   relaxed-rubocop
   rspec (~> 3.0)
   rubocop (~> 1.21)
-  sequel
   simplecov
   sqlite3
   verse-core!

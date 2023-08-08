@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "sequel"
 require "verse/core"
 
 require_relative "sequel/version"
