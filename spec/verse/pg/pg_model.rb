@@ -36,6 +36,12 @@ module Spec
 
       encoder :encoded, PointEncoder
 
+      def cleanup_old_questions
+        with_db_mode :rw do
+          table.where(Sequel.lit("id < ?", 2000)).delete
+        end
+      end
+
       # just a simple test for custom filter
       custom_filter "content.starts_with" do |collection, value|
         collection.where(Sequel.lit("content LIKE ?", "#{value}%"))

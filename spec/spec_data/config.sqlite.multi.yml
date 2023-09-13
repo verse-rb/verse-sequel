@@ -1,0 +1,18 @@
+service_name: verse_sequel_specs_sqlite
+description: Testing of the Sequel SQLite implementation.
+
+logging:
+  level: warn
+em:
+  adapter: local
+plugins:
+  - name: db_one
+    config:
+      mode: simple
+      db:
+        uri: sqlite://tmp/db_one.sqlite?max_connections=1
+  - name: db_two
+    config:
+    mode: simple
+    db:
+      uri: sqlite://tmp/db_two.sqlite?max_connections=1

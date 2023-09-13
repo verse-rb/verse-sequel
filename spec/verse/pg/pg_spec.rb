@@ -51,12 +51,12 @@ RSpec.describe "postgresql setup" do
 
         context "#index" do
           it "can query the questions" do
-            questions = question_repo.index({})
+            questions = question_repo.index
             expect(questions.count).to be(3)
           end
 
           it "can query the question with included" do
-            questions = question_repo.index({}, included: ["topic"])
+            questions = question_repo.index(included: ["topic"])
             expect(questions.count).to be(3)
             expect(questions.first.topic).not_to be(nil)
           end
@@ -96,7 +96,7 @@ RSpec.describe "postgresql setup" do
             end
 
             it "can order collection (multiple)" do
-              questions = question_repo.index(sort: "-encoded,id")
+              questions = question_repo.index(sort: "-encoded,id") # ORDER BY encoded DESC, id ASC
               expect(questions.first.id).to eq(2001)
             end
           end
@@ -270,6 +270,7 @@ RSpec.describe "postgresql setup" do
             question_repo.update(2001, { encoded: "2345" })
             encoded = question_repo.table.where(id: 2001).first[:encoded]
             expect(encoded).to eq("2.3.4.5")
+            expect(question_repo.find_by({id: 2001}).encoded).to eq("2345")
           end
 
           it "returns false if the model doesn't exists" do
