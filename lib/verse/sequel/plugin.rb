@@ -5,7 +5,6 @@ require_relative "./config"
 
 module Verse
   module Sequel
-    # https://docs.mongodb.com/ruby-driver/current/
     class Plugin < Verse::Plugin::Base
       class << self
         attr_accessor :on_create_connection
@@ -33,7 +32,7 @@ module Verse
       def create_connection_provider(config)
         if config[:uri]
           proc do |&block|
-            ::Sequel.connect(config[:uri]) do |db|
+            ::Sequel.connect(config[:uri], logger: Verse.logger) do |db|
               self.class.on_create_connection.call(db, config, &block)
             end
           end
@@ -44,7 +43,7 @@ module Verse
           config[:adapter] = config[:adapter].to_sym
 
           proc do |&block|
-            ::Sequel.connect(**config) do |db|
+            ::Sequel.connect(**config, logger: Verse.logger) do |db|
               self.class.on_create_connection.call(db, config, &block)
             end
           end

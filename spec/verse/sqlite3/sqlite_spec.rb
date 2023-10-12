@@ -17,7 +17,6 @@ RSpec.describe "sqlite setup" do
     Sequel.connect(uri) do |db|
       # Setup a sample structure.
       File.read(File.join("spec", "spec_data", "sqlite", "sqlite_fixtures.sql")).split(";").each do |query|
-        puts "Exec: #{query}"
         db.execute_ddl query
       end
     end

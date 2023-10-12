@@ -20,7 +20,6 @@ RSpec.describe "postgresql setup" do
     Sequel.connect(uri) do |db|
       # Setup a sample structure.
       File.read(File.join("spec", "spec_data", "pg", "pg_fixtures.sql")).split(";").each do |query|
-        puts "Exec: #{query}"
         db.execute query
       end
     end

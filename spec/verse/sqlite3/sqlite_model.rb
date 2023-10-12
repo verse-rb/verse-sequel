@@ -3,7 +3,7 @@
 module Spec
   module Sqlite3
     class TopicRepository < Verse::Sequel::Repository
-      table "topics"
+      self.table = "topics"
     end
 
     class TopicRecord < Verse::Model::Record::Base
@@ -32,7 +32,7 @@ module Spec
     end
 
     class QuestionRepository < Verse::Sequel::Repository
-      table "questions"
+      self.table = "questions"
 
       encoder :encoded, PointEncoder
 

@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/verse-rb/verse-core.git
-  revision: ae6b9ade7239555544543b7935b0a46ee31fc174
+  revision: 83e316f643e90d3b25bf038b9a42dee942029136
   branch: master
   specs:
     verse-core (2.0.0)
@@ -118,7 +118,7 @@ GEM
     thor (1.2.2)
     unicode-display_width (2.4.2)
     yard (0.9.34)
-    zeitwerk (2.6.11)
+    zeitwerk (2.6.12)
 
 PLATFORMS
   x86_64-linux

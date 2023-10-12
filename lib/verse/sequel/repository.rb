@@ -34,7 +34,6 @@ module Verse
       end
 
       def with_db_mode(mode, &block)
-        # We don't care about mode with MongoDB.
         Verse::Plugin[self.class.plugin].client(mode) do |_db|
           old_mode, @current_mode = @current_mode, mode
           client(&block)
