@@ -30,7 +30,7 @@ module Verse
         in: ->(col, column, value) { col.where(::Sequel.lit("#{column} IN ?", value)) },
         match: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "%#{escape_like(value)}%")) },
         contains: ->(col, column, value) {
-          value = [value] unless value.is_a?(Array) || value.is_a?(Hash)
+          value = [value] unless value.is_a?(Array) || value.is_a?(Hash) || value.is_a?(::Sequel::Postgres::JSONObject)
 
           case value
           when Array
@@ -39,7 +39,7 @@ module Verse
             else
               col.where(::Sequel.lit("#{column} && '{#{value.map(&:to_json).join(",")}}'"))
             end
-          when Hash
+          when Hash, ::Sequel::Postgres::JSONObject
             col.where(::Sequel.lit("#{column} @> ?", value.to_json))
           else
             # :nocov:

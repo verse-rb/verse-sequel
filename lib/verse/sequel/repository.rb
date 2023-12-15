@@ -105,16 +105,12 @@ module Verse
 
       def index_impl(
         filters,
-        scope: scoped(:read),
-        included: [],
-        page: 1,
-        items_per_page: 1_000,
-        sort: nil,
-        record: self.class.model_class,
-        query_count: true
+        scope:,
+        page:,
+        items_per_page:,
+        sort:,
+        query_count:
       )
-        filters = encode_filters(filters)
-
         with_db_mode :r do
           query = filtering.filter_by(scope, filters, self.class.custom_filters)
 
@@ -124,23 +120,13 @@ module Verse
 
           count = query_count ? query.count : nil
 
-          prepare_included(included, query, record: record)
-
           [query.to_a, { count: count }.compact]
         end
       end
 
-      def find_by(filters = {}, scope: scoped(:read), included: [], record: self.class.model_class)
-        filters = encode_filters(filters)
-
+      def find_by_impl(filters = {}, scope: scoped(:read))
         with_db_mode :r do
-          result = filtering.filter_by(scope, filters, self.class.custom_filters).first
-
-          return unless result
-
-          result = decode(result)
-          set = prepare_included(included, [result], record: record)
-          record.new(result, include_set: set)
+          return filtering.filter_by(scope, filters, self.class.custom_filters).first
         end
       end
 

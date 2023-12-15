@@ -35,6 +35,7 @@ module Spec
       self.table = "questions"
 
       encoder :encoded, PointEncoder
+      encoder :custom, Verse::Sequel::JsonEncoder
 
       def cleanup_old_questions
         with_db_mode :rw do
@@ -54,6 +55,7 @@ module Spec
       field :content
       field :topic_id
       field :encoded
+      field :custom
 
       belongs_to :topic, primary_key: :id, repository: "Spec::Pg::TopicRepository"
 
