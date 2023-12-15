@@ -17,15 +17,9 @@ module Verse
         end
       end
 
-      self.pkey   = :id
       self.plugin = :sequel
 
       attr_reader :auth_context
-
-      # define expected primary key (default to `id`)
-      def pkey
-        self.class.pkey
-      end
 
       def initialize(auth_context)
         @current_mode = :r
@@ -74,7 +68,7 @@ module Verse
 
       def update_impl(id, attributes, scope)
         with_db_mode :rw do
-          scope = scope.where(pkey => id)
+          scope = scope.where(self.class.primary_key => id)
           result = scope.update(attributes)
 
           return false if result == 0
@@ -129,7 +123,7 @@ module Verse
 
       def delete_impl(id)
         with_db_mode :rw do
-          count = table.where(pkey => id).delete
+          count = table.where(self.class.primary_key => id).delete
 
           return count > 0
         end
