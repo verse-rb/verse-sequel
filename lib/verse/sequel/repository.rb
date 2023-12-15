@@ -68,7 +68,7 @@ module Verse
 
       def update_impl(id, attributes, scope)
         with_db_mode :rw do
-          scope = scope.where(self.class.primary_key => id)
+          scope = scope.where(self.class.primary_key.to_sym => id)
           result = scope.update(attributes)
 
           return false if result == 0
@@ -123,7 +123,7 @@ module Verse
 
       def delete_impl(id)
         with_db_mode :rw do
-          count = table.where(self.class.primary_key => id).delete
+          count = table.where(self.class.primary_key.to_sym => id).delete
 
           return count > 0
         end
