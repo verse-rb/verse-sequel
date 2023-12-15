@@ -72,11 +72,8 @@ module Verse
         end
       end
 
-      event("updated")
-      def update(id, attributes, scope = scoped(:update))
+      def update_impl(id, attributes, scope)
         with_db_mode :rw do
-          attributes = encode attributes
-
           scope = scope.where(pkey => id)
           result = scope.update(attributes)
 
