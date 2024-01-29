@@ -4,47 +4,38 @@ module Verse
   module Sequel
     # The configuration schema for the Verse::Sequel::Plugin
     # plugin configuration
-    class Config < Verse::Validation::Contract
-      params do
-        optional(:adapter).filled(:string)
-        optional(:mode)
-          .filled(:string)
-          .value(included_in?: %w[cluster simple])
+    Config = Verse::Schema.define do
+      field?(:adapter, String).filled
+      field?(:mode, Symbol).in?(%i[cluster simple])
 
-        optional(:master).filled(:hash)
-        optional(:replica).filled(:hash)
-        optional(:db).filled(:hash)
-      end
+      field?(:master, Hash)
+      field?(:replica, Hash)
+      field?(:db, Hash)
 
-      rule(:mode, :master, :replica, :db) do
-        if values[:mode].to_s == "cluster"
+      rule([:mode, :master, :replica, :db], "illegal configuration") do |values|
+        if values[:mode] == :cluster
           if values[:master].nil? || values[:replica].nil?
-            # :nocov:
-            key.failure("must contains the master and replica keys")
-            # :nocov:
+            next false
           end
 
           if values[:db]
-            # :nocov:
-            key.failures("must not define db keys")
-            # :nocov:
+            next false
           end
         end
 
-        if values[:mode].to_s == "simple"
+        if values[:mode] == :simple
           if values[:db].nil?
-            # :nocov:
-            key.failure("must define db keys")
-            # :nocov:
+            next false
           end
 
           if values[:master] || values[:replica]
-            # :nocov:
-            key.failures("must not define master or replica keys")
-            # :nocov:
+            next false
           end
         end
+
+        true
       end
     end
+
   end
 end

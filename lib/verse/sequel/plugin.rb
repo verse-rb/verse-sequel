@@ -51,12 +51,12 @@ module Verse
       end
 
       def validate_config!
-        result = Verse::Sequel::Config.new.call(
+        result = Verse::Sequel::Config.validate(
           @config
         )
-        return result unless result.errors.any?
+        return result.value unless result.fail?
 
-        raise Verse::Config::SchemaError, "Config errors: #{result.errors.to_h}"
+        raise Verse::Config::SchemaError, "Config errors: #{result.errors}"
       end
 
       def load_config
