@@ -275,7 +275,7 @@ RSpec.describe "postgresql setup" do
           it "encodes correctly (json)" do
             question_repo.update(2001, { custom: { a: 1 } })
             encoded = question_repo.find_by({id: 2001}).custom
-            expect(encoded).to eq({ "a" => 1 })
+            expect(encoded).to eq({ a: 1 })
           end
 
           it "returns false if the model doesn't exists" do
