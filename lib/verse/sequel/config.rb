@@ -36,6 +36,5 @@ module Verse
         true
       end
     end
-
   end
 end

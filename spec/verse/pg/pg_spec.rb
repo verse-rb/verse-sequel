@@ -269,12 +269,12 @@ RSpec.describe "postgresql setup" do
             question_repo.update(2001, { encoded: "2345" })
             encoded = question_repo.table.where(id: 2001).first[:encoded]
             expect(encoded).to eq("2.3.4.5")
-            expect(question_repo.find_by({id: 2001}).encoded).to eq("2345")
+            expect(question_repo.find_by({ id: 2001 }).encoded).to eq("2345")
           end
 
           it "encodes correctly (json)" do
             question_repo.update(2001, { custom: { a: 1 } })
-            encoded = question_repo.find_by({id: 2001}).custom
+            encoded = question_repo.find_by({ id: 2001 }).custom
             expect(encoded).to eq({ a: 1 })
           end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Verse
   module Sequel
     module JsonEncoder
@@ -5,6 +7,7 @@ module Verse
 
       def encode(value)
         return value if value.is_a?(::Sequel::Postgres::JSONObject)
+
         ::Sequel.pg_json_wrap(value)
       end
 
@@ -18,7 +21,7 @@ module Verse
         end
 
         # Deep replace string keys with symbols:
-        return jsonhash.each_with_object({}) do |(k, v), h|
+        jsonhash.each_with_object({}) do |(k, v), h|
           h[k.to_sym] = convert(v)
         end
       end

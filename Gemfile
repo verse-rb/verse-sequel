@@ -16,8 +16,8 @@ gem "simplecov"
 
 gem "bootsnap", "~> 1.16"
 
-gem "verse-schema", github: "verse-rb/verse-schema", branch: "master"
 gem "verse-core", github: "verse-rb/verse-core", branch: "master"
+gem "verse-schema", github: "verse-rb/verse-schema", branch: "master"
 
 gem "pg"
 gem "sqlite3"
