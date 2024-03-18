@@ -142,13 +142,15 @@ module Verse
       end
 
       def prepare_ordering(query, sort)
-        if !sort.is_a?(String)
+        sort = sort.split(",") if sort.is_a?(String)
+
+        if !sort.is_a?(Array)
           # :nocov:
-          raise ArgumentError, "incorrect ordering parameter type (must be string)"
+          raise ArgumentError, "incorrect ordering parameter type (must be Array or String, but got `#{sort.class}`)"
           # :nocov:
         end
 
-        sort.split(",").each do |x|
+        sort.each do |x|
           query = if x[0] == "-"
                     query.order(::Sequel.desc(x[1..].to_sym))
                   else
