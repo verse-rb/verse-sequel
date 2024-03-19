@@ -135,11 +135,14 @@ module Verse
       private
 
       def init_client(connection_block, key, &block)
+        old_value = nil
+
         connection_block.call do |db|
+          old_value = Thread.current[key]
           Thread.current[key] = db
           block.call(db)
         ensure
-          Thread.current[key] = nil
+          Thread.current[key] = old_value
         end
       end
     end
