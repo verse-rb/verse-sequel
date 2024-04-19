@@ -116,6 +116,16 @@ RSpec.describe "postgresql setup" do
               expect(questions.count).to eq(3)
             end
 
+            it "can filter collection (eq with nil)" do
+              questions = question_repo.index({ id: nil })
+              expect(questions.count).to eq(0)
+            end
+
+            it "can filter collection (eq)" do
+              questions = question_repo.index({ id__eq: 2002 })
+              expect(questions.count).to eq(1)
+            end
+
             context "eq with array" do
               it "can filter collection (eq with array)" do
                 questions = question_repo.index({ id__eq: [2003, 2002] })
