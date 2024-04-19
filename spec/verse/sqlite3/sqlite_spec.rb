@@ -84,6 +84,11 @@ RSpec.describe "sqlite setup" do
           expect(question.id).to eq(2001)
         end
 
+        it "can filter collection (eq with nil)" do
+          questions = question_repo.index({ id: nil })
+          expect(questions.count).to eq(0)
+        end
+
         it "can filter collection (lt, gt)" do
           questions = question_repo.index({ id__lt: 2003, id__gt: 2001 })
           expect(questions.count).to eq(1)
@@ -92,6 +97,11 @@ RSpec.describe "sqlite setup" do
         it "can filter collection (lte, gte)" do
           questions = question_repo.index({ id__lte: 2003, id__gte: 2001 })
           expect(questions.count).to eq(3)
+        end
+
+        it "can filter collection (eq)" do
+          questions = question_repo.index({ id__eq: 2002 })
+          expect(questions.count).to eq(1)
         end
 
         context "eq with array" do
