@@ -34,6 +34,10 @@ module Verse
           value
         when String
           JSON.parse(value, symbolize_names: true)
+        when ::Sequel::Postgres::JSONBString
+          value.to_s
+        when ::Sequel::Postgres::JSONBArray
+          value.to_a
         when nil
           value
         else

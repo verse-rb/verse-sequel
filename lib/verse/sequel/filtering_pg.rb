@@ -20,8 +20,8 @@ module Verse
             end
           when ::Sequel::Dataset
             col.where(::Sequel.lit("#{column} IN ?", value))
-          when nil
-            col.where(::Sequel.lit("#{column} IS NULL")) 
+          when nil, ::Sequel::Postgres::JSONNull # I really don't get those wrappers in Sequel, they are soooooo ugly
+            col.where(::Sequel.lit("#{column} IS NULL"))
           else
             col.where(::Sequel.lit("#{column} = ?", value))
           end

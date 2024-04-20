@@ -117,8 +117,9 @@ RSpec.describe "postgresql setup" do
             end
 
             it "can filter collection (eq with nil)" do
-              questions = question_repo.index({ id: nil })
-              expect(questions.count).to eq(0)
+              # TODO
+              questions = question_repo.index({ custom: nil })
+              expect(questions.count).to eq(1)
             end
 
             it "can filter collection (eq)" do
