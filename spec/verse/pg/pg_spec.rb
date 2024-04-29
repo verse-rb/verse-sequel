@@ -315,6 +315,13 @@ RSpec.describe "postgresql setup" do
             expect(encoded).to eq("h.e.l.l.o. .w.o.r.l.d")
           end
 
+          it "encodes array correctly" do
+            result = question_repo.create(content: "A new subject", topic_id: 1001, labels: ["science", "math"])
+            labels = question_repo.table.where(id: result).first[:labels]
+
+            expect(labels).to eq(Verse::Sequel::PgArrayEncoder.encode(["science", "math"]))
+          end
+
           it "fails to create a new record if postgres throw an error" do
             # missing content field, but set to NOT NULL
             expect do

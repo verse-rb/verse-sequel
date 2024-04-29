@@ -36,6 +36,7 @@ module Spec
 
       encoder :encoded, PointEncoder
       encoder :custom, Verse::Sequel::JsonEncoder
+      encoder :labels, Verse::Sequel::PgArrayEncoder
 
       def cleanup_old_questions
         with_db_mode :rw do
