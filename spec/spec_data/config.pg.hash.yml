@@ -10,6 +10,9 @@ plugins:
     config:
       mode: simple
       db:
+        extensions:
+          - pg_json
+          - pg_array
         adapter: postgres
         user: postgres
         host: localhost
