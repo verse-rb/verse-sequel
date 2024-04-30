@@ -3,7 +3,8 @@ CREATE TABLE questions (
   id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   content text NOT NULL,
   encoded text,
-  topic_id bigint
+  topic_id bigint,
+  custom jsonb
 );
 
 CREATE TABLE topics (

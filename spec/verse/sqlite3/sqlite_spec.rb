@@ -85,8 +85,8 @@ RSpec.describe "sqlite setup" do
         end
 
         it "can filter collection (eq with nil)" do
-          questions = question_repo.index({ id: nil })
-          expect(questions.count).to eq(0)
+          questions = question_repo.index({ custom: nil })
+          expect(questions.count).to eq(3)
         end
 
         it "can filter collection (lt, gt)" do
