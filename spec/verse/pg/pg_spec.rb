@@ -179,7 +179,7 @@ RSpec.describe "postgresql setup" do
 
             context "contains" do
               it "contains in array" do
-                questions = question_repo.index({ labels__contains: ["science"] })
+                questions = question_repo.index({ labels__contains: ["science", "sky"] })
                 expect(questions.count).to eq(2)
               end
 
@@ -229,6 +229,11 @@ RSpec.describe "postgresql setup" do
           it "can query the questions" do
             question = question_repo.find_by({ id: 2002 })
             expect(question.id).to be(2002)
+          end
+
+          it "can query the question with array" do
+            question = question_repo.find_by({ labels__contains: ["sky"] })
+            expect(question.id).to be(2003)
           end
 
           it "can query the question with included" do

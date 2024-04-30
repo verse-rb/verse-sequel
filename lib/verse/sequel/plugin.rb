@@ -39,8 +39,7 @@ module Verse
         else
           hash = config.dup
           hash.delete(:mode)
-          extensions = config[:extensions]
-          config.delete(:extensions)
+          extensions = config.delete(:extensions)
 
           config[:adapter] = config[:adapter].to_sym
 
