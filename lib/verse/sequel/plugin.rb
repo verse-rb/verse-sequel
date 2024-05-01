@@ -39,11 +39,13 @@ module Verse
         else
           hash = config.dup
           hash.delete(:mode)
+          extensions = config.delete(:extensions)
 
           config[:adapter] = config[:adapter].to_sym
 
           proc do |&block|
             ::Sequel.connect(**config, logger: Verse.logger) do |db|
+              config.merge!(extensions: extensions) if extensions
               self.class.on_create_connection.call(db, config, &block)
             end
           end

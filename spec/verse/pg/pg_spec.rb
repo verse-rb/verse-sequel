@@ -179,7 +179,7 @@ RSpec.describe "postgresql setup" do
 
             context "contains" do
               it "contains in array" do
-                questions = question_repo.index({ labels__contains: ["science"] })
+                questions = question_repo.index({ labels__contains: ["science", "sky"] })
                 expect(questions.count).to eq(2)
               end
 
@@ -229,6 +229,11 @@ RSpec.describe "postgresql setup" do
           it "can query the questions" do
             question = question_repo.find_by({ id: 2002 })
             expect(question.id).to be(2002)
+          end
+
+          it "can query the question with array" do
+            question = question_repo.find_by({ labels__contains: ["sky"] })
+            expect(question.id).to be(2003)
           end
 
           it "can query the question with included" do
@@ -313,6 +318,13 @@ RSpec.describe "postgresql setup" do
             result = question_repo.create(content: "A new subject", topic_id: 1001, encoded: "hello world")
             encoded = question_repo.table.where(id: result).first[:encoded]
             expect(encoded).to eq("h.e.l.l.o. .w.o.r.l.d")
+          end
+
+          it "encodes array correctly" do
+            result = question_repo.create(content: "A new subject", topic_id: 1001, labels: ["science", "math"])
+            labels = question_repo.table.where(id: result).first[:labels]
+
+            expect(labels).to eq(::Sequel.pg_array(["science", "math"]))
           end
 
           it "fails to create a new record if postgres throw an error" do
