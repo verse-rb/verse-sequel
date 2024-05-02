@@ -67,6 +67,8 @@ module Verse
       end
 
       def update_impl(id, attributes, scope)
+        return true if attributes.empty?
+
         with_db_mode :rw do
           scope = scope.where(self.class.primary_key.to_sym => id)
           result = scope.update(attributes)
