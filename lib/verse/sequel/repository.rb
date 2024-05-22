@@ -66,7 +66,7 @@ module Verse
         end
       end
 
-      def update_impl(id, attributes, scope)
+      def update_impl(id, attributes, scope:)
         return true if attributes.empty?
 
         with_db_mode :rw do
