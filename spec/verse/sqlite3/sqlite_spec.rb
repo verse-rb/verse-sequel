@@ -56,18 +56,18 @@ RSpec.describe "sqlite setup" do
       end
 
       it "can query the topics with included (has many link)" do
-        topics = topic_repo.index(included: ["questions"])
+        topics = topic_repo.index({}, included: ["questions"])
         expect(topics.first.questions.count).to eq(2)
         expect(topics.first.questions.map(&:id)).to eq([2001, 2003])
       end
 
       it "decodes correctly" do
-        questions = question_repo.index
+        questions = question_repo.index({})
         expect(questions.first.encoded).to eq("1234")
       end
 
       it "belongs_to with condition" do
-        questions = question_repo.index(included: ["topic_with_condition"])
+        questions = question_repo.index({}, included: ["topic_with_condition"])
 
         questions.each do |q|
           if q.topic_id == 1001 # science topic
@@ -161,18 +161,18 @@ RSpec.describe "sqlite setup" do
         end
 
         it "paginates" do
-          questions = question_repo.index(page: 1, items_per_page: 1)
+          questions = question_repo.index({}, page: 1, items_per_page: 1)
           expect(questions.count).to eq(1)
-          questions = question_repo.index(page: 2, items_per_page: 1)
+          questions = question_repo.index({}, page: 2, items_per_page: 1)
           expect(questions.count).to eq(1)
-          questions = question_repo.index(page: 3, items_per_page: 1)
+          questions = question_repo.index({}, page: 3, items_per_page: 1)
           expect(questions.count).to eq(1)
-          questions = question_repo.index(page: 4, items_per_page: 1)
+          questions = question_repo.index({}, page: 4, items_per_page: 1)
           expect(questions.count).to eq(0)
 
-          questions = question_repo.index(page: 1, items_per_page: 2)
+          questions = question_repo.index({}, page: 1, items_per_page: 2)
           expect(questions.count).to eq(2)
-          questions = question_repo.index(page: 2, items_per_page: 2)
+          questions = question_repo.index({}, page: 2, items_per_page: 2)
           expect(questions.count).to eq(1)
         end
       end

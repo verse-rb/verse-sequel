@@ -50,29 +50,29 @@ RSpec.describe "postgresql setup" do
 
         context "#index" do
           it "can query the questions" do
-            questions = question_repo.index
+            questions = question_repo.index({})
             expect(questions.count).to be(3)
           end
 
           it "can query the question with included" do
-            questions = question_repo.index(included: ["topic"])
+            questions = question_repo.index({}, included: ["topic"])
             expect(questions.count).to be(3)
             expect(questions.first.topic).not_to be(nil)
           end
 
           it "can query the topics with included (has many link)" do
-            topics = topic_repo.index(included: ["questions"])
+            topics = topic_repo.index({}, included: ["questions"])
             expect(topics.first.questions.count).to eq(2)
             expect(topics.first.questions.map(&:id)).to eq([2001, 2003])
           end
 
           it "decodes correctly" do
-            questions = question_repo.index
+            questions = question_repo.index({})
             expect(questions.first.encoded).to eq("1234")
           end
 
           it "belongs_to with condition" do
-            questions = question_repo.index(included: ["topic_with_condition"])
+            questions = question_repo.index({}, included: ["topic_with_condition"])
 
             questions.each do |q|
               if q.topic_id == 1001 # science topic
@@ -85,17 +85,17 @@ RSpec.describe "postgresql setup" do
 
           context "with ordering" do
             it "can order collection (simple asc)" do
-              questions = question_repo.index(sort: "id")
+              questions = question_repo.index({}, sort: "id")
               expect(questions.first.id).to eq(2001)
             end
 
             it "can order collection (simple desc)" do
-              questions = question_repo.index(sort: "-id")
+              questions = question_repo.index({}, sort: "-id")
               expect(questions.first.id).to eq(2003)
             end
 
             it "can order collection (multiple)" do
-              questions = question_repo.index(sort: "-encoded,id") # ORDER BY encoded DESC, id ASC
+              questions = question_repo.index({}, sort: "-encoded,id") # ORDER BY encoded DESC, id ASC
               expect(questions.first.id).to eq(2001)
             end
           end
@@ -208,18 +208,18 @@ RSpec.describe "postgresql setup" do
             end
 
             it "paginates" do
-              questions = question_repo.index(page: 1, items_per_page: 1)
+              questions = question_repo.index({}, page: 1, items_per_page: 1)
               expect(questions.count).to eq(1)
-              questions = question_repo.index(page: 2, items_per_page: 1)
+              questions = question_repo.index({}, page: 2, items_per_page: 1)
               expect(questions.count).to eq(1)
-              questions = question_repo.index(page: 3, items_per_page: 1)
+              questions = question_repo.index({}, page: 3, items_per_page: 1)
               expect(questions.count).to eq(1)
-              questions = question_repo.index(page: 4, items_per_page: 1)
+              questions = question_repo.index({}, page: 4, items_per_page: 1)
               expect(questions.count).to eq(0)
 
-              questions = question_repo.index(page: 1, items_per_page: 2)
+              questions = question_repo.index({}, page: 1, items_per_page: 2)
               expect(questions.count).to eq(2)
-              questions = question_repo.index(page: 2, items_per_page: 2)
+              questions = question_repo.index({}, page: 2, items_per_page: 2)
               expect(questions.count).to eq(1)
             end
           end
