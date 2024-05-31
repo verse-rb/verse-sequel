@@ -21,7 +21,7 @@ module Verse
           when ::Sequel::Dataset
             col.where(::Sequel.lit("#{column} IN ?", value))
           when nil
-            col.where(::Sequel.lit("#{column} IS NULL")) 
+            col.where(::Sequel.lit("#{column} IS NULL"))
           else
             col.where(::Sequel.lit("#{column} = ?", value))
           end

@@ -2,7 +2,7 @@ service_name: verse_sequel_specs_sqlite
 description: Testing of the Sequel SQLite implementation.
 
 logging:
-  level: warn
+  level: info
 em:
   adapter: local
 plugins:

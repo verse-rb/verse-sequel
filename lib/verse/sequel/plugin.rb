@@ -45,6 +45,10 @@ module Verse
           raise ArgumentError, "Invalid mode: #{config.mode}"
         end
 
+        if @database.respond_to?(:wrap_json_primitives)
+          @database.wrap_json_primitives = true
+        end
+
         @database.extension(*config.extensions)
       end
 
