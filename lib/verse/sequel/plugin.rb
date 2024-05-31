@@ -45,11 +45,11 @@ module Verse
           raise ArgumentError, "Invalid mode: #{config.mode}"
         end
 
+        @database.extension(*config.extensions)
+
         if @database.respond_to?(:wrap_json_primitives)
           @database.wrap_json_primitives = true
         end
-
-        @database.extension(*config.extensions)
       end
 
       def validate_config!
