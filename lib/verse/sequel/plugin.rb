@@ -10,15 +10,6 @@ module Verse
         attr_accessor :on_create_connection
       end
 
-      @on_create_connection = ->(db, config, &block){
-        extensions = config[:extensions]
-        db.extension(*extensions.map(&:to_sym)) if extensions
-
-        if db.respond_to?(:wrap_json_primitives)
-          db.wrap_json_primitives = true
-        end
-      }
-
       attr_reader :config
 
       def description
@@ -27,37 +18,38 @@ module Verse
         # :nocov:
       end
 
-      def create_connection_provider(config)
-        if config[:uri]
-          proc do |&block|
-            ::Sequel.connect(config[:uri], logger: Verse.logger, max_connections: 1, single_threaded: true) do |db|
-              self.class.on_create_connection.call(db, config)
-              block.call(db)
-            ensure
-              db.disconnect
-            end
-          end
+      def init_db(config)
+
+        case config.mode
+        when :simple
+          @database = ::Sequel.connect(
+            config.db.uri,
+            logger: Verse.logger,
+            max_connections: config.db.max_connections,
+          )
+        when :cluster
+          @database = ::Sequel.connect(
+            config.master.uri,
+            logger: Verse.logger,
+            max_connections: config.master.max_connections,
+            servers: {
+              read_only: {
+                uri: config.replica.uri,
+                max_connections: config.replica.max_connections,
+                logger: Verse.logger,
+              }
+            }
+          )
+          @database.extension :server_block
         else
-          hash = config.dup
-          hash.delete(:mode)
-          extensions = config.delete(:extensions)
-
-          config[:adapter] = config[:adapter].to_sym
-
-          proc do |&block|
-            ::Sequel.connect(**config, logger: Verse.logger, max_connections: 1, single_threaded: true) do |db|
-              config.merge!(extensions: extensions) if extensions
-              self.class.on_create_connection.call(db, config)
-              block.call(db)
-            ensure
-              db.disconnect
-            end
-          end
+          raise ArgumentError, "Invalid mode: #{config.mode}"
         end
+
+        @database.extension(*config.extensions)
       end
 
       def validate_config!
-        result = Verse::Sequel::Config.validate(
+        result = Verse::Sequel::ConfigSchema.validate(
           @config
         )
         return result.value unless result.fail?
@@ -65,27 +57,11 @@ module Verse
         raise Verse::Config::SchemaError, "Config errors: #{result.errors}"
       end
 
-      def load_config
-        @config = validate_config!
-
-        case @config[:mode].to_sym
-        when :simple
-          @new_connection_r = create_connection_provider(@config[:db])
-          @new_connection_rw = @new_connection_r
-        when :cluster
-          @new_connection_r = create_connection_provider(@config[:replica])
-          @new_connection_rw = create_connection_provider(@config[:master])
-        else
-          # :nocov:
-          raise ArgumentError, "unknown mode `#{@config[:mode]}`"
-          # :nocov:
-        end
-      end
-
       def on_init
         require "sequel"
 
-        load_config
+        @config = validate_config!
+        init_db(@config)
 
         # :nocov: #
         logger.debug{ "[DBAdapter] Sequel with #{@config.inspect}" }
@@ -97,60 +73,41 @@ module Verse
       end
 
       def simple_mode?
-        @new_connection_rw == @new_connection_r
+        @config.mode == :simple
       end
 
       # Create or reuse the existing thread connection for the database.
       def client(mode = :rw, &block)
         if simple_mode?
-          db = Thread.current.thread_variable_get(:"verse-sequel-db")
-
-          return block.call(db) if db
-
-          init_client(
-            @new_connection_rw, :"verse-sequel-db", &block
-          )
+          block.call(@database)
         else
           case mode
           when :rw
-            db = Thread.current.thread_variable_get(:"verse-sequel-db-rw")
-            return block.call(db) if db
+            begin
+              old_db = Thread.current[:"verse-sequel-db"]
+              Thread.current[:"verse-sequel-db"] = :default
 
-            init_client(
-              @new_connection_rw, :"verse-sequel-db-rw", &block
-            )
+              @database.with_server(:default) do
+                block.call(@database)
+              end
+            ensure
+              Thread.current[:"verse-sequel-db"] = old_db
+            end
           when :r
-            # In the case we are already in read-write mode,
-            # we get RW the connection to do the read operation.
-            # This is to prevent weird issue occuring in transaction, when
-            # two different connection are used.
-            db = Thread.current.thread_variable_get(:"verse-sequel-db-rw")
-            return block.call(db) if db
+            # Continue on RW mode if we are already in RW due to transactions
+            # basically, if we say:
+            # client(:rw){ ... client(:r) { ... } }
+            # the second client will be in RW mode.
+            current_db = Thread.current[:"verse-sequel-db"] || :read_only
 
-            # Otherwise we move to the read-only connection:
-            db = Thread.current.thread_variable_get(:"verse-sequel-db-r")
-            return block.call(db) if db
-
-            init_client(
-              @new_connection_r, :"verse-sequel-db-r", &block
-            )
+            @database.with_server(current_db) do
+              block.call(@database)
+            end
           end
         end
       end
 
-      private
 
-      def init_client(connection_block, key, &block)
-        old_value = nil
-
-        connection_block.call do |db|
-          old_value = Thread.current.thread_variable_get(key)
-          Thread.current.thread_variable_set(key, db)
-          block.call(db)
-        ensure
-          Thread.current.thread_variable_set(key, old_value)
-        end
-      end
     end
   end
 end
