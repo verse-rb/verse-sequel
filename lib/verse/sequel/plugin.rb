@@ -17,8 +17,6 @@ module Verse
         if db.respond_to?(:wrap_json_primitives)
           db.wrap_json_primitives = true
         end
-
-        block.call(db)
       }
 
       attr_reader :config
@@ -32,8 +30,9 @@ module Verse
       def create_connection_provider(config)
         if config[:uri]
           proc do |&block|
-            ::Sequel.connect(config[:uri], logger: Verse.logger) do |db|
-              self.class.on_create_connection.call(db, config, &block)
+            ::Sequel.connect(config[:uri], logger: Verse.logger, max_connections: 1, single_threaded: true) do |db|
+              self.class.on_create_connection.call(db, config)
+              block.call(db)
             end
           end
         else
@@ -44,9 +43,10 @@ module Verse
           config[:adapter] = config[:adapter].to_sym
 
           proc do |&block|
-            ::Sequel.connect(**config, logger: Verse.logger) do |db|
+            ::Sequel.connect(**config, logger: Verse.logger, max_connections: 1, single_threaded: true) do |db|
               config.merge!(extensions: extensions) if extensions
-              self.class.on_create_connection.call(db, config, &block)
+              self.class.on_create_connection.call(db, config)
+              block.call(db)
             end
           end
         end
@@ -128,7 +128,7 @@ module Verse
             return block.call(db) if db
 
             init_client(
-              @new_connection_r, :"verse-sequel-db-r"
+              @new_connection_r, :"verse-sequel-db-r", &block
             )
           end
         end
