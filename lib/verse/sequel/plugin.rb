@@ -33,6 +33,8 @@ module Verse
             ::Sequel.connect(config[:uri], logger: Verse.logger, max_connections: 1, single_threaded: true) do |db|
               self.class.on_create_connection.call(db, config)
               block.call(db)
+            ensure
+              db.disconnect
             end
           end
         else
@@ -47,6 +49,8 @@ module Verse
               config.merge!(extensions: extensions) if extensions
               self.class.on_create_connection.call(db, config)
               block.call(db)
+            ensure
+              db.disconnect
             end
           end
         end
