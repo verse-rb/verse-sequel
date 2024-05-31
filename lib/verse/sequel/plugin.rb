@@ -19,7 +19,6 @@ module Verse
       end
 
       def init_db(config)
-
         case config.mode
         when :simple
           @database = ::Sequel.connect(
@@ -50,6 +49,8 @@ module Verse
         if @database.respond_to?(:wrap_json_primitives)
           @database.wrap_json_primitives = true
         end
+
+        @database.disconnect # Start fresh.
       end
 
       def validate_config!
