@@ -19,6 +19,8 @@ module Verse
       end
 
       def init_db(config)
+        return if @initialized # Already done
+
         case config.mode
         when :simple
           @database = ::Sequel.connect(
@@ -51,6 +53,7 @@ module Verse
         end
 
         @database.disconnect # Start fresh.
+        @initialized = true
       end
 
       def validate_config!
@@ -66,7 +69,6 @@ module Verse
         require "sequel"
 
         @config = validate_config!
-        init_db(@config)
 
         # :nocov: #
         logger.debug{ "[DBAdapter] Sequel with #{@config.inspect}" }
@@ -81,8 +83,15 @@ module Verse
         @config.mode == :simple
       end
 
+      def on_stop
+        @database.disconnect # close connection(s) if any.
+        @initialized = false
+      end
+
       # Create or reuse the existing thread connection for the database.
       def client(mode = :rw, &block)
+        init_db(@config)
+
         if simple_mode?
           block.call(@database)
         else
