@@ -99,7 +99,7 @@ module Verse
       # Create or reuse the existing thread connection for the database.
       def client(mode = :rw, &block)
         if simple_mode?
-          db = Thread.current[:"verse-sequel-db"]
+          db = Thread.current.thread_variable_get(:"verse-sequel-db")
 
           return block.call(db) if db
 
@@ -109,7 +109,7 @@ module Verse
         else
           case mode
           when :rw
-            db = Thread.current[:"verse-sequel-db-rw"]
+            db = Thread.current.thread_variable_get(:"verse-sequel-db-rw")
             return block.call(db) if db
 
             init_client(
@@ -120,11 +120,11 @@ module Verse
             # we get RW the connection to do the read operation.
             # This is to prevent weird issue occuring in transaction, when
             # two different connection are used.
-            db = Thread.current[:"verse-sequel-db-rw"]
+            db = Thread.current.thread_variable_get(:"verse-sequel-db-rw")
             return block.call(db) if db
 
             # Otherwise we move to the read-only connection:
-            db = Thread.current[:"verse-sequel-db-r"]
+            db = Thread.current.thread_variable_get(:"verse-sequel-db-r")
             return block.call(db) if db
 
             init_client(
@@ -140,11 +140,11 @@ module Verse
         old_value = nil
 
         connection_block.call do |db|
-          old_value = Thread.current[key]
-          Thread.current[key] = db
+          old_value = Thread.current.thread_variable_get(key)
+          Thread.current.thread_variable_set(key, db)
           block.call(db)
         ensure
-          Thread.current[key] = old_value
+          Thread.current.thread_variable_set(key, old_value)
         end
       end
     end
