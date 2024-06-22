@@ -26,6 +26,14 @@ module Verse
             col.where(::Sequel.lit("#{column} = ?", value))
           end
         },
+        exists: ->(col, column, value) {
+          case value
+          when "", "0", "false", false
+            col.where(::Sequel.lit("#{column} IS NULL"))
+          else
+            col.where(::Sequel.lit("#{column} IS NOT NULL"))
+          end
+        },
         neq: ->(col, column, value) { col.where(::Sequel.lit("#{column} != ?", value)) },
         prefix: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "#{escape_like(value)}%")) },
         suffix: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "%#{escape_like(value)}")) },
