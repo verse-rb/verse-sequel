@@ -109,7 +109,8 @@ module Verse
 
           query = query.offset( (page - 1) * items_per_page).limit(items_per_page) if page
 
-          query = prepare_ordering(query, sort) if sort
+          sort ||= [self.class.primary_key.to_s]
+          query = prepare_ordering(query, sort)
 
           count = query_count ? query.count : nil
 
