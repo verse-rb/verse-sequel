@@ -38,8 +38,8 @@ module Verse
           value.to_s
         when ::Sequel::Postgres::JSONBArray
           value.to_a
-        when nil
-          value
+        when nil, NilClass, ::Sequel::Postgres::JSONBNull
+          nil
         else
           raise "cannot convert from `#{value.class}`"
         end
