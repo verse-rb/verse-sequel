@@ -2,7 +2,6 @@
 
 module Verse
   module Sequel
-
     DbConfig = Struct.new(
       :uri,
       :max_connections,
