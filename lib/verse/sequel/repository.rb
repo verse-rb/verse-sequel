@@ -109,7 +109,8 @@ module Verse
 
           query = query.offset( (page - 1) * items_per_page).limit(items_per_page) if page
 
-          sort ||= [self.class.primary_key.to_s]
+          sort ||= [
+            [self.class.table, self.class.primary_key.to_s].join(".")]
           query = prepare_ordering(query, sort)
 
           count = query_count ? query.count : nil
@@ -154,11 +155,25 @@ module Verse
         end
 
         sort.each do |x|
-          query = if x[0] == "-"
-                    query.order(::Sequel.desc(x[1..].to_sym))
-                  else
-                    query.order(::Sequel.asc(x.to_sym))
-                  end
+          method = nil
+          column = nil
+
+          if x[0] == "-"
+            method = :desc
+            column = x[1..]
+          else
+            method = :asc
+            column = x
+          end
+
+          if column.include?(".")
+            table_name, column = column.split(".")
+            expression = ::Sequel.qualify(table_name.to_sym, column.to_sym)
+          else
+            expression = column.to_sym
+          end
+
+          query = query.order(::Sequel.send(method, expression))
         end
 
         query

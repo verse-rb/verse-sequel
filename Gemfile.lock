@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/verse-rb/verse-core.git
-  revision: 6b7edcfb614fdbeb5865daa6373dbbe5fa3e579d
+  revision: ce87b002414dde167b910d938dfbf29e39d16703
   branch: master
   specs:
     verse-core (2.0.0)
@@ -29,7 +29,7 @@ GEM
     bootsnap (1.18.3)
       msgpack (~> 1.2)
     coderay (1.1.3)
-    concurrent-ruby (1.3.1)
+    concurrent-ruby (1.3.3)
     diff-lcs (1.5.1)
     docile (1.4.0)
     i18n (1.10.0)
