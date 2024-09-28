@@ -57,6 +57,13 @@ module Verse
       def create_impl(data)
         with_db_mode :rw do
           begin
+            # BUGFIX: PostgreSQL is confused by an empty array.
+            # This occurs because Sequel casts an empty array to Array([]),
+            # but it doesn't retain the type of the column, leading to the issue.
+            data = data.transform_values do |v|
+              v.is_a?(Array) && v.empty? ? ::Sequel.lit("{}") : v
+            end
+
             id = table.insert(data)
           rescue ::Sequel::ConstraintViolation
             raise Verse::Error::CannotCreateRecord
@@ -70,6 +77,13 @@ module Verse
         return true if attributes.empty?
 
         with_db_mode :rw do
+          # BUGFIX: PostgreSQL is confused by an empty array.
+          # This occurs because Sequel casts an empty array to Array([]),
+          # but it doesn't retain the type of the column, leading to the issue.
+          attributes = attributes.transform_values do |v|
+            v.is_a?(Array) && v.empty? ? ::Sequel.lit("{}") : v
+          end
+
           scope = scope.where(self.class.primary_key.to_sym => id)
           result = scope.update(attributes)
 
