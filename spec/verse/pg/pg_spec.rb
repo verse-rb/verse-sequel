@@ -305,6 +305,11 @@ RSpec.describe "postgresql setup" do
               question_repo.update!(42, { content: "A new question?" })
             end.to raise_error(Verse::Error::RecordNotFound)
           end
+
+          it "handle update of empty array" do
+            result = question_repo.update(2001, { labels: [] })
+            expect(result).to be(true)
+          end
         end
 
         context "#create" do
@@ -332,6 +337,13 @@ RSpec.describe "postgresql setup" do
             expect do
               question_repo.create(topic_id: 1001)
             end.to raise_error(Verse::Error::CannotCreateRecord)
+          end
+
+          it "handle properly empty array" do
+            result = question_repo.create(content: "A new subject", topic_id: 1001, labels: [])
+            labels = question_repo.table.where(id: result).first[:labels]
+
+            expect(labels).to eq(::Sequel.pg_array([]))
           end
         end
 
