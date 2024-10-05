@@ -81,7 +81,7 @@ module Verse
           # This occurs because Sequel casts an empty array to Array([]),
           # but it doesn't retain the type of the column, leading to the issue.
           attributes = attributes.transform_values do |v|
-            v.is_a?(::Sequel::Postgres::PGArray) && v.empty? ? ::Sequel.lit("{}") : v
+            v.is_a?(::Sequel::Postgres::PGArray) && v.empty? ? ::Sequel.lit("'{}'") : v
           end
 
           scope = scope.where(self.class.primary_key.to_sym => id)
