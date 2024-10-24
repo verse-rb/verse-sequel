@@ -6,9 +6,12 @@ module Verse
       module_function
 
       def encode(value)
-        return value if value.is_a?(::Sequel::Postgres::JSONObject)
+        return value if value.is_a?(::Sequel::Postgres::JSONBObject)
 
-        ::Sequel.pg_json_wrap(value)
+        # weird case handling by Sequel.
+        return nil if value.nil?
+
+        ::Sequel.pg_jsonb(value)
       end
 
       def convert(jsonhash)
@@ -16,7 +19,7 @@ module Verse
           return jsonhash.map{ |v| convert(v) }
         end
 
-        unless jsonhash.is_a?(::Sequel::Postgres::JSONHashBase) || jsonhash.is_a?(Hash)
+        unless jsonhash.is_a?(::Sequel::Postgres::JSONBHash) || jsonhash.is_a?(Hash)
           return jsonhash
         end
 
@@ -28,7 +31,7 @@ module Verse
 
       def decode(value)
         case value
-        when ::Sequel::Postgres::JSONHashBase
+        when ::Sequel::Postgres::JSONBHash
           convert(value)
         when Hash
           value

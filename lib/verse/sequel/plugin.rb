@@ -21,6 +21,8 @@ module Verse
       def init_db(config)
         return if @initialized # Already done
 
+        ::Sequel.extension :pg_json_ops
+
         case config.mode
         when :simple
           @database = ::Sequel.connect(

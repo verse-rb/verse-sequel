@@ -117,7 +117,6 @@ RSpec.describe "postgresql setup" do
             end
 
             it "can filter collection (eq with nil)" do
-              # TODO
               questions = question_repo.index({ custom: nil })
               expect(questions.count).to eq(1)
             end
@@ -191,6 +190,7 @@ RSpec.describe "postgresql setup" do
               it "contains in jsonb" do
                 questions = question_repo.index({ custom__contains: { a: 1 } })
                 expect(questions.count).to eq(2)
+
                 questions = question_repo.index({ custom__contains: { b: 2 } })
                 expect(questions.count).to eq(1)
               end
