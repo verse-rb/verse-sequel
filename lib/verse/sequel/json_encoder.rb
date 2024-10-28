@@ -30,6 +30,7 @@ module Verse
       end
 
       def decode(value)
+        binding.pry
         case value
         when ::Sequel::Postgres::JSONBHash
           convert(value)
@@ -41,8 +42,16 @@ module Verse
           value.to_s
         when ::Sequel::Postgres::JSONBArray
           value.to_a
+        when ::Sequel::Postgres::JSONBFalse
+          false
+        when ::Sequel::Postgres::JSONBTrue
+          true
         when nil, NilClass, ::Sequel::Postgres::JSONBNull
           nil
+        when ::Sequel::Postgres::JSONBFloat
+          value.to_f
+        when ::Sequel::Postgres::JSONBInteger
+          value.to_i
         else
           raise "cannot convert from `#{value.class}`"
         end
