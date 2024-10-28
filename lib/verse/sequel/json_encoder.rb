@@ -30,7 +30,6 @@ module Verse
       end
 
       def decode(value)
-        binding.pry
         case value
         when ::Sequel::Postgres::JSONBHash
           convert(value)
