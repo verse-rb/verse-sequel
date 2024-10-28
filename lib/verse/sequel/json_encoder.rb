@@ -11,7 +11,7 @@ module Verse
         # weird case handling by Sequel.
         return nil if value.nil?
 
-        ::Sequel.pg_jsonb(value)
+        ::Sequel.pg_jsonb(value.to_json)
       end
 
       def convert(jsonhash)
