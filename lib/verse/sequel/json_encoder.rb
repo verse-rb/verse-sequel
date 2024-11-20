@@ -6,12 +6,12 @@ module Verse
       module_function
 
       def encode(value)
-        return value if value.is_a?(::Sequel::Postgres::JSONBObject)
+        return value if value.is_a?(::Sequel::Postgres::JSONBOp)
 
         # weird case handling by Sequel.
         return nil if value.nil?
 
-        ::Sequel.pg_jsonb(value.to_json)
+        ::Sequel.pg_jsonb(value.is_a?(String) ? value : value.to_json)
       end
 
       def convert(jsonhash)

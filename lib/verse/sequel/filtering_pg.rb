@@ -41,7 +41,7 @@ module Verse
         match: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "%#{escape_like(value)}%")) },
         contains: ->(col, column, value) {
           value = [value] unless value.is_a?(Array) || value.is_a?(Hash) ||
-                                 value.is_a?(::Sequel::Postgres::JSONBObject)
+                                 value.is_a?(::Sequel::Postgres::JSONBOp)
 
           case value
           when Array
@@ -50,8 +50,9 @@ module Verse
             else
               col.where(::Sequel.lit("#{column} && '{#{value.map(&:to_json).join(",")}}'"))
             end
-          when Hash, ::Sequel::Postgres::JSONBObject
-            col.where(::Sequel.lit("#{column} @> ?", value.to_json))
+          when Hash, ::Sequel::Postgres::JSONBOp
+            value = value.is_a?(Hash) ? value.to_json : value
+            col.where(::Sequel.lit("#{column} @> ?", value))
           else
             # :nocov:
             raise "unreachable"
