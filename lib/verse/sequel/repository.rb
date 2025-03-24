@@ -105,7 +105,7 @@ module Verse
         query_count:
       )
         with_db_mode :r do
-          query = filtering.filter_by(scope, filters, self.class.custom_filters)
+          query = filtering.filter_by(scope, filters, self)
 
           query = query.offset( (page - 1) * items_per_page).limit(items_per_page) if page
 
@@ -122,7 +122,7 @@ module Verse
 
       def find_by_impl(filters = {}, scope: scoped(:read))
         with_db_mode :r do
-          return filtering.filter_by(scope, filters, self.class.custom_filters).first
+          return filtering.filter_by(scope, filters, self).first
         end
       end
 

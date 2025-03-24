@@ -41,9 +41,15 @@ module Verse
         match: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "%#{escape_like(value)}%")) },
         contains: ->(col, column, value) {
           value = [value] unless value.is_a?(Array) || value.is_a?(Hash) ||
-                                 value.is_a?(::Sequel::Postgres::JSONBObject)
+                                 value.is_a?(::Sequel::Postgres::JSONBObject) ||
+                                 value.is_a?(::Sequel::Dataset) ||
+                                 value.is_a?(::Sequel::Postgres::JSONBOp)
 
           case value
+          when ::Sequel::Dataset
+            col.where(::Sequel.lit("#{column} @> ?", value.select_map(column)))
+          when ::Sequel::Postgres::JSONBOp
+            col.where(::Sequel.lit("#{column} @> ?", value))
           when Array
             if value.empty?
               col.where(::Sequel.lit("false"))
@@ -68,14 +74,17 @@ module Verse
         %i<contains in eq>.include?(operator.to_sym)
       end
 
-      def filter_by(collection, filtering_parameters, custom_filters)
+      def filter_by(collection, filtering_parameters, repo_instance)
         return collection if filtering_parameters.nil? || filtering_parameters.empty?
 
         filtering_parameters.each do |key, value|
-          custom_filter = custom_filters && custom_filters[key.to_s]
+          custom_filters = repo_instance.class.custom_filters
+          custom_filter = custom_filters&.fetch(key.to_s, nil)
 
           if custom_filter
-            collection = custom_filter.call(collection, value)
+            collection = repo_instance.instance_exec(
+              collection, value, &custom_filter
+            )
             next
           end
 
