@@ -48,6 +48,7 @@ module Spec
       field :content
       field :topic_id
       field :encoded
+      field :custom
 
       belongs_to :topic, primary_key: :id, repository: "Spec::Sqlite3::TopicRepository"
 
