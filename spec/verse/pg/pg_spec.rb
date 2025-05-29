@@ -143,9 +143,45 @@ RSpec.describe "postgresql setup" do
               end
             end
 
-            it "can filter out a result using neq" do
-              questions = question_repo.index({ id__neq: 2002 })
-              expect(questions.count).to eq(2)
+            context "neq" do
+              it "can filter out a result using a single value" do
+                questions = question_repo.index({ id__neq: 2002 })
+                expect(questions.count).to eq(2)
+                expect(questions.map(&:id)).not_to include(2002)
+              end
+
+              it "can filter out results using an array of values" do
+                questions = question_repo.index({ id__neq: [2001, 2003] })
+                expect(questions.count).to eq(1)
+                expect(questions.first.id).to eq(2002)
+              end
+
+              it "returns all records when neq is used with an empty array" do
+                questions = question_repo.index({ id__neq: [] })
+                expect(questions.count).to eq(3)
+              end
+
+              it "can filter out results using a dataset" do
+                dataset = question_repo.table.where(id: [2001, 2003]).select(:id)
+                questions = question_repo.index({ id__neq: dataset })
+                expect(questions.count).to eq(1)
+                expect(questions.first.id).to eq(2002)
+              end
+
+              it "can filter out null values" do
+                questions = question_repo.index({ custom__neq: nil })
+                expect(questions.count).to eq(2) # Assuming 2 records have non-null custom
+                questions.each do |q|
+                  expect(q.custom).not_to be_nil
+                end
+              end
+
+              it "can filter out non-null values (i.e., keep only nulls)" do
+                questions = question_repo.index({ custom__neq: { a: 1, b: 2 } })
+
+                expect(questions.count).to eq(1)
+                expect(questions.map(&:id)).to include(2002)
+              end
             end
 
             it "can filter out result using prefix" do

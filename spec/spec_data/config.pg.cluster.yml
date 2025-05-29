@@ -13,6 +13,6 @@ plugins:
         - pg_array
       mode: cluster
       master:
-        uri: postgres://postgres@localhost:5432/verse_sequel_test
+        uri: postgres://postgres:postgres@localhost:5432/verse_sequel_test
       replica:
-        uri: postgres://postgres@localhost:5432/verse_sequel_test
+        uri: postgres://postgres:postgres@localhost:5432/verse_sequel_test

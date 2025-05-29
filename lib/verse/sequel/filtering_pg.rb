@@ -34,7 +34,22 @@ module Verse
             col.where(::Sequel.lit("#{column} IS NOT NULL"))
           end
         },
-        neq: ->(col, column, value) { col.where(::Sequel.lit("#{column} != ?", value)) },
+        neq: ->(col, column, value) {
+          case value
+          when Array
+            if value.empty?
+              col.where(::Sequel.lit("true"))
+            else
+              col.where(::Sequel.lit("#{column} NOT IN ?", value))
+            end
+          when ::Sequel::Dataset
+            col.where(::Sequel.lit("#{column} NOT IN ?", value))
+          when nil, ::Sequel::Postgres::JSONNull # I really don't get those wrappers in Sequel, they are soooooo ugly
+            col.where(::Sequel.lit("#{column} IS NOT NULL"))
+          else
+            col.where(::Sequel.lit("#{column} != ?", value))
+          end
+        },
         prefix: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "#{escape_like(value)}%")) },
         suffix: ->(col, column, value) { col.where(::Sequel.lit("#{column} ILIKE ?", "%#{escape_like(value)}")) },
         in: ->(col, column, value) { col.where(::Sequel.lit("#{column} IN ?", value)) },

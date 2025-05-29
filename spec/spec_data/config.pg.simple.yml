@@ -13,4 +13,4 @@ plugins:
         - pg_array
       mode: simple
       db:
-        uri: postgres://postgres@localhost:5432/verse_sequel_test
+        uri: postgres://postgres:postgres@localhost:5432/verse_sequel_test
