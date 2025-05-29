@@ -30,21 +30,15 @@ module Verse
           case value
           when Array
             if value.empty?
-              # If eq returns no records for empty array, neq should return all records.
               col # No filtering, or col.where(::Sequel.lit("true"))
             else
-              col.exclude(::Sequel.lit("#{column} IN ?", value))
+              col.where(::Sequel.lit("#{column} NOT IN ?", value))
             end
           when ::Sequel::Dataset
-            col.exclude(::Sequel.lit("#{column} IN ?", value))
+            col.where(::Sequel.lit("#{column} NOT IN ?", value))
           when nil
             col.where(::Sequel.lit("#{column} IS NOT NULL"))
           else
-            # Standard SQL `!=` or `<>`.
-            # Note: `NULL != value` is NULL (effectively false in WHERE).
-            # If `column` can be NULL and `neq: some_value` should include rows where `column` is NULL,
-            # this would need to be `(#{column} != ? OR #{column} IS NULL)`.
-            # Sticking to direct reversal of `col = value` for now.
             col.where(::Sequel.lit("#{column} != ?", value))
           end
         },

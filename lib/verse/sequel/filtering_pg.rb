@@ -38,7 +38,7 @@ module Verse
           case value
           when Array
             if value.empty?
-              col.where(::Sequel.lit("true"))
+              col
             else
               col.where(::Sequel.lit("#{column} NOT IN ?", value))
             end
