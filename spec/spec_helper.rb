@@ -12,6 +12,7 @@ end
 
 require "pry"
 require "verse/sequel"
+require "verse/sequel/spec"
 
 require "bundler"
 Bundler.require
