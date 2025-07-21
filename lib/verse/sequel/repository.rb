@@ -114,9 +114,21 @@ module Verse
           ]
           query = prepare_ordering(query, sort)
 
-          count = query_count ? query.count : nil
+          more = false
+          if query_count
+            # make sure we don't count more than 1000 records
+            # to avoid performance issues
+            new_count = query.limit(1000).count
+            if new_count == 1000
+              more = true
+            end
 
-          [query.to_a, { count: count }.compact]
+            count = (page - 1) * items_per_page + new_count
+          else
+            count = nil
+          end
+
+          [query.to_a, { count: count, more: more }.compact]
         end
       end
 
