@@ -107,28 +107,26 @@ module Verse
         with_db_mode :r do
           query = filtering.filter_by(scope, filters, self)
 
-          query = query.offset( (page - 1) * items_per_page).limit(items_per_page) if page
-
           sort ||= [
             [self.class.table, self.class.primary_key.to_s].join(".")
           ]
           query = prepare_ordering(query, sort)
 
-          more = false
-          if query_count
-            # make sure we don't count more than 1000 records
-            # to avoid performance issues
-            new_count = query.limit(1000).count
-            if new_count == 1000
-              more = true
-            end
+          offset = (page - 1) * items_per_page
+          query = query.offset(offset).limit(items_per_page) if page
 
-            count = (page - 1) * items_per_page + new_count
-          else
-            count = nil
+          meta_data = {}
+
+          if query_count
+            # For performance: count max 1000 rows from offset
+            count_query = query.limit(1000)
+            limited_count = count_query.count
+
+            meta_data[:count] = offset + limited_count
+            meta_data[:more] = limited_count == 1000
           end
 
-          [query.to_a, { count: count, more: more }.compact]
+          [query.to_a, meta_data.compact]
         end
       end
 
