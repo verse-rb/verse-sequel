@@ -86,7 +86,7 @@ module Verse
       end
 
       def on_stop
-        @database.disconnect # close connection(s) if any.
+        @database&.disconnect # close connection(s) if any.
         @initialized = false
       end
 
