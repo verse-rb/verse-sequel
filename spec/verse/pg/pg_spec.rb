@@ -433,7 +433,6 @@ RSpec.describe "postgresql setup" do
             expect(metadata[:more]).to be(true)
           end
 
-
           it "returns correct metadata when query_count is false" do
             results, metadata = employee_repo.index_impl(
               {},
