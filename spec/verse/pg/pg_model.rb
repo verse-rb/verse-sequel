@@ -64,5 +64,18 @@ module Spec
         record[:content] =~ /Hydrogen/
       }
     end
+
+    class EmployeeRepository < Verse::Sequel::Repository
+      self.table = "employees"
+    end
+
+    class EmployeeRecord < Verse::Model::Record::Base
+      field :id, primary: true
+      field :name
+      field :email
+      field :department
+      field :salary
+      field :hire_date
+    end
   end
 end
