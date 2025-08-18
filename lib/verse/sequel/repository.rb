@@ -112,21 +112,25 @@ module Verse
           ]
           query = prepare_ordering(query, sort)
 
-          offset = (page - 1) * items_per_page
-          query = query.offset(offset).limit(items_per_page) if page
+          metadata = {}
 
-          meta_data = {}
+          if page
+            offset = (page - 1) * items_per_page
+            query = query.offset(offset).limit(items_per_page)
 
-          if query_count
-            # For performance: count max 1000 rows from offset
-            count_query = query.limit(1000)
-            limited_count = count_query.count
+            if query_count
+              # For performance: count max 1000 rows from offset
+              count_query = query.limit(1000)
+              limited_count = count_query.count
 
-            meta_data[:count] = offset + limited_count
-            meta_data[:more] = limited_count == 1000
+              metadata[:count] = offset + limited_count
+              metadata[:more] = limited_count == 1000
+            end
+          else
+            metadata[:count] = query_count ? query.count : nil
           end
 
-          [query.to_a, meta_data.compact]
+          [query.to_a, metadata.compact]
         end
       end
 

@@ -403,6 +403,42 @@ RSpec.describe "sqlite setup" do
         expect(metadata[:count]).to eq(1500) # offset (1400) + limited_count (100)
         expect(metadata[:more]).to be(false) # Should be false since limited_count < 1000
       end
+
+      it "handles nil page correctly with query_count true" do
+        # Test when page is nil - should return all records without pagination
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: nil,
+          items_per_page: nil,
+          sort: ["id"],
+          query_count: true
+        )
+
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(1500) # Should return all 1500 employees
+        expect(metadata).to be_a(Hash)
+        expect(metadata).to have_key(:count)
+        expect(metadata[:count]).to eq(1500) # Should count all records
+        expect(metadata).not_to have_key(:more) # No :more key when no pagination
+      end
+
+      it "handles nil page correctly with query_count false" do
+        # Test when page is nil and query_count is false
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: nil,
+          items_per_page: nil,
+          sort: ["id"],
+          query_count: false
+        )
+
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(1500) # Should return all 1500 employees
+        expect(metadata).to be_a(Hash)
+        expect(metadata).to be_empty # No metadata when query_count is false
+      end
     end
   end
 end
