@@ -42,6 +42,7 @@ RSpec.describe "sqlite setup" do
   context "testing repository" do
     let(:question_repo){ Spec::Sqlite3::QuestionRepository.new(Verse::Auth::Context[:system]) }
     let(:topic_repo){ Spec::Sqlite3::TopicRepository.new(Verse::Auth::Context[:system]) }
+    let(:employee_repo){ Spec::Sqlite3::EmployeeRepository.new(Verse::Auth::Context[:system]) }
 
     context "#index" do
       it "can query the questions" do
@@ -331,6 +332,112 @@ RSpec.describe "sqlite setup" do
       it "returns false if nothing is deleted" do
         result = question_repo.delete(42)
         expect(result).to eq(false)
+      end
+    end
+
+    context "#index_impl with query_count" do
+      it "returns count and more metadata when query_count is true" do
+        # Test with a large dataset (1500 employees)
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: 1,
+          items_per_page: 50,
+          sort: ["id"],
+          query_count: true
+        )
+
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(50)
+        expect(metadata).to be_a(Hash)
+        expect(metadata).to have_key(:count)
+        expect(metadata).to have_key(:more)
+        expect(metadata[:count]).to be >= 50
+        expect(metadata[:more]).to be(true) # Should be true since we have 1500 records
+      end
+
+      it "handles pagination correctly with query_count" do
+        # Test pagination on page 2
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: 2,
+          items_per_page: 100,
+          sort: ["id"],
+          query_count: true
+        )
+
+        expect(results.length).to eq(100)
+        expect(metadata[:count]).to eq(1100) # offset (100) + limited_count (1000)
+        expect(metadata[:more]).to be(true)
+      end
+
+      it "returns correct metadata when query_count is false" do
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: 1,
+          items_per_page: 50,
+          sort: ["id"],
+          query_count: false
+        )
+
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(50)
+        expect(metadata).to be_a(Hash)
+        expect(metadata).to be_empty # No count metadata when query_count is false
+      end
+
+      it "handles large offset with query_count limit of 1000" do
+        # Test with a large offset to trigger the 1000 row limit
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: 15, # offset = (15-1) * 100 = 1400
+          items_per_page: 100,
+          sort: ["id"],
+          query_count: true
+        )
+
+        expect(results.length).to eq(100) # Should still get 100 results
+        expect(metadata[:count]).to eq(1500) # offset (1400) + limited_count (100)
+        expect(metadata[:more]).to be(false) # Should be false since limited_count < 1000
+      end
+
+      it "handles nil page correctly with query_count true" do
+        # Test when page is nil - should return all records without pagination
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: nil,
+          items_per_page: nil,
+          sort: ["id"],
+          query_count: true
+        )
+
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(1500) # Should return all 1500 employees
+        expect(metadata).to be_a(Hash)
+        expect(metadata).to have_key(:count)
+        expect(metadata[:count]).to eq(1500) # Should count all records
+        expect(metadata).not_to have_key(:more) # No :more key when no pagination
+      end
+
+      it "handles nil page correctly with query_count false" do
+        # Test when page is nil and query_count is false
+        results, metadata = employee_repo.index_impl(
+          {},
+          scope: employee_repo.table,
+          page: nil,
+          items_per_page: nil,
+          sort: ["id"],
+          query_count: false
+        )
+
+        expect(results).to be_an(Array)
+        expect(results.length).to eq(1500) # Should return all 1500 employees
+        expect(metadata).to be_a(Hash)
+        expect(metadata).to be_empty # No metadata when query_count is false
       end
     end
   end
